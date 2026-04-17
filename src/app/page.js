@@ -1,4 +1,4 @@
-giimport Link from "next/link";
+import Link from "next/link";
 import PricingCards from "@/components/PricingCards";
 import { ArrowRight, TrendingUp, TrendingDown, Minus, ChevronRight, BarChart2 } from "lucide-react";
 import { CATEGORY_TREE } from "@/lib/categories";

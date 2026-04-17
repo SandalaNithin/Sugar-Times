@@ -20,7 +20,6 @@ const coreItems = [
 ];
 
 const specializedItems = [
-  { label: "Categories", href: "/admin/categories", icon: Folder },
   { label: "Magazines", href: "/admin/magazines", icon: BookOpen },
   { label: "Market Rates", href: "/admin/markets", icon: TrendingUp },
   { label: "Video Gallery", href: "/admin/videos", icon: Video },
@@ -266,18 +265,7 @@ export default function AdminLayout({ children }) {
                 priority
               />
             </div>
-            <p className="text-[10px] text-emerald-200/70 tracking-[0.25em] uppercase font-black truncate group-hover:text-emerald-100 transition-colors">
-              Admin
-            </p>
           </Link>
-          <button
-            type="button"
-            onClick={toggleSidebar}
-            title="Close sidebar"
-            className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors shrink-0"
-          >
-            <PanelLeftClose size={16} />
-          </button>
         </div>
 
         <Suspense fallback={<div className="p-8 text-emerald-200/50 text-xs text-center">Loading Nav...</div>}>

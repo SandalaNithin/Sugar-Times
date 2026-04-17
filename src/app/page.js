@@ -1,86 +1,129 @@
-import Link from "next/link";
+giimport Link from "next/link";
 import PricingCards from "@/components/PricingCards";
 import { ArrowRight, TrendingUp, TrendingDown, Minus, ChevronRight, BarChart2 } from "lucide-react";
 import { CATEGORY_TREE } from "@/lib/categories";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   DATA FETCHING — Server-side, cached 60s
+   DATA FETCHING — Server-side, always fresh
    ═══════════════════════════════════════════════════════════════════════════ */
-async function getHomeData() {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-  const fetchJSON = async (url) => {
-    try {
-      const res = await fetch(url, { next: { revalidate: 60 } });
-      return res.ok ? await res.json() : null;
-    } catch {
-      return null;
-    }
+async function fetchJSON(url) {
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    return res.ok ? await res.json() : null;
+  } catch {
+    return null;
+  }
+}
+
+function mapArticle(a) {
+  return {
+    _id: a._id,
+    title: a.title,
+    excerpt: a.excerpt || "",
+    category: a.category || "",
+    subcategory: a.subcategory || "",
+    image: a.image || "",
+    author: a.author || "Sugar Times Team",
+    trending: a.trending || false,
+    premium: a.premium || false,
+    createdAt: a.createdAt || "",
+    date: new Date(a.createdAt).toLocaleDateString("en-IN", {
+      month: "long", day: "numeric", year: "numeric",
+    }),
   };
+}
 
-  const [categoriesRaw, articlesRaw, magazinesRaw, marketsRaw, adsRaw] = await Promise.all([
-    fetchJSON(`${apiUrl}/categories`),
-    fetchJSON(`${apiUrl}/articles?limit=300`),
-    fetchJSON(`${apiUrl}/magazines`),
-    fetchJSON(`${apiUrl}/markets`),
-    fetchJSON(`${apiUrl}/advertisements`),
+function extractArticles(raw) {
+  const list = Array.isArray(raw?.articles) ? raw.articles : Array.isArray(raw) ? raw : [];
+  return list.filter((a) => a.status !== "draft").map(mapArticle);
+}
+
+async function getHomeData() {
+  /* ── Step 1: Fetch categories + global data in parallel ──────────── */
+  const [categoriesRaw, magazinesRaw, marketsRaw, adsRaw] = await Promise.all([
+    fetchJSON(`${API_URL}/categories`),
+    fetchJSON(`${API_URL}/magazines`),
+    fetchJSON(`${API_URL}/markets`),
+    fetchJSON(`${API_URL}/advertisements`),
   ]);
 
-  /* ── Categories ──────────────────────────────────────────────────────── */
+  /* ── Categories ──────────────────────────────────────────────────── */
   const dbCategories = Array.isArray(categoriesRaw) ? categoriesRaw : [];
   let categories;
   if (dbCategories.length > 0) {
     categories = dbCategories;
   } else {
     categories = CATEGORY_TREE.map((p) => ({
-      _id: p.slug,
-      name: p.label,
-      slug: p.slug,
-      emoji: p.emoji,
-      color: p.color,
+      _id: p.slug, name: p.label, slug: p.slug, emoji: p.emoji, color: p.color,
       children: p.children.map((c) => ({ _id: c.slug, name: c.label, slug: c.slug })),
     }));
   }
 
-  /* ── Articles ────────────────────────────────────────────────────────── */
-  const rawArticles = Array.isArray(articlesRaw?.articles)
-    ? articlesRaw.articles
-    : Array.isArray(articlesRaw) ? articlesRaw : [];
+  /* ── Step 2: Fetch articles PER parent category + latest articles ─ */
+  /* Uses the same backend ?category= filter that works on /news page */
+  const articleFetches = categories.map((cat) =>
+    fetchJSON(`${API_URL}/articles?category=${encodeURIComponent(cat.name)}&limit=10`)
+  );
+  /* Also fetch latest articles (no category filter) for hero + sidebar */
+  articleFetches.push(fetchJSON(`${API_URL}/articles?limit=20`));
 
-  const articles = rawArticles
-    .filter((a) => a.status !== "draft")
-    .map((a) => ({
-      _id: a._id,
-      title: a.title,
-      excerpt: a.excerpt || "",
-      category: a.category || "",
-      subcategory: a.subcategory || "",
-      image: a.image || "",
-      author: a.author || "Sugar Times Team",
-      trending: a.trending || false,
-      premium: a.premium || false,
-      date: new Date(a.createdAt).toLocaleDateString("en-IN", {
-        month: "long", day: "numeric", year: "numeric",
-      }),
-    }));
+  const articleResults = await Promise.all(articleFetches);
 
-  const displayArticles = articles.filter((a) => !a.trending);
+  /* Last result is the "latest" (no category filter) */
+  const latestRaw = articleResults.pop();
+  const allLatest = extractArticles(latestRaw);
 
-  /* ── Magazines ───────────────────────────────────────────────────────── */
+  /* Build sections: each category gets its own articles from backend */
+  const sections = categories.map((cat, i) => {
+    const raw = articleResults[i];
+    const catArticles = extractArticles(raw);
+
+    /* Also split articles by sub-category */
+    const childSections = (cat.children || []).map((child) => {
+      const childName = child.name.toLowerCase();
+      return {
+        ...child,
+        articles: catArticles.filter(
+          (a) => a.subcategory?.toLowerCase() === childName || a.category?.toLowerCase() === childName
+        ),
+      };
+    });
+
+    return { ...cat, allArticles: catArticles, childSections };
+  });
+
+  /* Hero + sidebar show ALL latest articles (newest first).
+     Merge global latest + newest from each category, deduplicate. */
+  const seenIds = new Set(allLatest.map((a) => a._id));
+  const extraFromCategories = [];
+  for (const sec of sections) {
+    for (const a of sec.allArticles) {
+      if (!seenIds.has(a._id)) {
+        extraFromCategories.push(a);
+        seenIds.add(a._id);
+      }
+    }
+  }
+  const displayArticles = [...allLatest, ...extraFromCategories]
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  /* ── Magazines ───────────────────────────────────────────────────── */
   const magazinesArray = Array.isArray(magazinesRaw) ? magazinesRaw : magazinesRaw?.magazines || [];
   const magazines = magazinesArray.map((m) => ({
     _id: m._id, title: m.title, cover: m.coverImage || "",
     pages: m.pages || 48, premium: m.accessType === "premium",
   }));
 
-  /* ── Markets ─────────────────────────────────────────────────────────── */
+  /* ── Markets ─────────────────────────────────────────────────────── */
   const markets = Array.isArray(marketsRaw) ? marketsRaw : marketsRaw?.markets || [];
 
-  /* ── Advertisements ──────────────────────────────────────────────────── */
+  /* ── Advertisements ──────────────────────────────────────────────── */
   const allAds = Array.isArray(adsRaw) ? adsRaw : adsRaw?.advertisements || [];
   const activeAds = allAds.filter((ad) => ad.active);
 
-  return { categories, displayArticles, magazines, markets, activeAds };
+  return { categories, sections, displayArticles, magazines, markets, activeAds };
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -89,21 +132,7 @@ async function getHomeData() {
 function img(url) {
   if (!url) return "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800";
   if (url.startsWith("http")) return url;
-  return `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}${url}`;
-}
-
-function articlesFor(articles, parentName, childNames = []) {
-  const all = [parentName, ...childNames].map((n) => n.toLowerCase());
-  return articles.filter(
-    (a) => all.includes(a.category?.toLowerCase()) || all.includes(a.subcategory?.toLowerCase())
-  );
-}
-
-function articlesByChild(articles, childName) {
-  const n = childName.toLowerCase();
-  return articles.filter(
-    (a) => a.category?.toLowerCase() === n || a.subcategory?.toLowerCase() === n
-  );
+  return `${API_URL}${url}`;
 }
 
 /* ── Section color palette ─────────────────────────────────────────────── */
@@ -117,21 +146,48 @@ const PALETTES = [
 ];
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   HERO CARD COMPONENTS
+   ═══════════════════════════════════════════════════════════════════════════ */
+function HeroCard({ article: a }) {
+  return (
+    <Link href={`/article/${a._id}`} className="relative group overflow-hidden block h-full bg-[#052616] border border-white/5 rounded-lg shadow-lg">
+      <img src={img(a.image)} alt={a.title} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-5">
+        <h3 className="text-white text-[16px] font-black leading-snug group-hover:text-green-400 transition-colors line-clamp-3">{a.title}</h3>
+        <div className="flex items-center gap-2 mt-2.5">
+          <span className="text-emerald-400 text-[10px] uppercase font-black tracking-widest">{a.subcategory || a.category}</span>
+          <span className="w-1 h-1 rounded-full bg-white/30" />
+          <span className="text-white/50 text-[10px] font-bold">{a.date}</span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function HeroCardLarge({ article: a }) {
+  return (
+    <Link href={`/article/${a._id}`} className="relative group overflow-hidden block h-full bg-[#052616] border border-white/5 rounded-lg shadow-xl">
+      <img src={img(a.image)} alt={a.title} className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent flex flex-col justify-end p-8 md:p-12">
+        <span className="bg-green-600 text-white text-[11px] font-black uppercase px-3 py-1.5 w-max mb-5 tracking-widest rounded-md border border-green-400/30">{a.subcategory || a.category}</span>
+        <h2 className="text-white text-xl sm:text-3xl md:text-5xl font-black leading-[1.05] group-hover:text-green-400 transition-colors mb-4">{a.title}</h2>
+        <div className="flex items-center gap-4">
+          <span className="text-white font-black text-xs flex items-center gap-2 bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            {a.date}
+          </span>
+          <span className="text-white/40 text-[11px] font-black uppercase tracking-[0.15em]">Sugar Times</span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    PAGE COMPONENT
    ═══════════════════════════════════════════════════════════════════════════ */
 export default async function HomePage() {
-  const { categories, displayArticles, magazines, markets, activeAds } = await getHomeData();
-
-  /* ── Build category sections with articles ──────────────────────────── */
-  const sections = categories.map((parent) => {
-    const childNames = (parent.children || []).map((c) => c.name);
-    const allArticles = articlesFor(displayArticles, parent.name, childNames);
-    const childSections = (parent.children || []).map((child) => ({
-      ...child,
-      articles: articlesByChild(displayArticles, child.name),
-    }));
-    return { ...parent, allArticles, childSections };
-  });
+  const { sections, displayArticles, magazines, markets, activeAds } = await getHomeData();
 
   const heroArticles = displayArticles.slice(0, 5);
   const latestArticles = displayArticles.slice(0, 8);
@@ -154,64 +210,45 @@ export default async function HomePage() {
     <div className="bg-[#fbfcfa]">
 
       {/* ═══════════════════════════════════════════════════════════════════
-          HERO SECTION
+          HERO — Latest articles from ALL categories (excluding breaking news)
           ═══════════════════════════════════════════════════════════════════ */}
       {heroArticles.length > 0 && (
         <section className="bg-[#031d10] pt-4 sm:pt-8 pb-10 sm:pb-14 px-4 shadow-2xl border-b border-green-950">
           <div className="max-w-[1440px] mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-auto lg:h-[550px]">
-              {/* Left 2 stacked */}
-              <div className="grid grid-rows-2 gap-4 lg:col-span-1 h-[550px] lg:h-full">
-                {heroArticles.slice(0, 2).map((a) => (
-                  <Link key={a._id} href={`/article/${a._id}`} className="relative group overflow-hidden block h-full bg-[#052616] border border-white/5 rounded-lg shadow-lg">
-                    <img src={img(a.image)} alt={a.title} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-5">
-                      <h3 className="text-white text-[16px] font-black leading-snug group-hover:text-green-400 transition-colors line-clamp-3">{a.title}</h3>
-                      <div className="flex items-center gap-2 mt-2.5">
-                        <span className="text-emerald-400 text-[10px] uppercase font-black tracking-widest">{a.category}</span>
-                        <span className="w-1 h-1 rounded-full bg-white/30" />
-                        <span className="text-white/50 text-[10px] font-bold">{a.date}</span>
-                      </div>
-                    </div>
-                  </Link>
+            {heroArticles.length >= 5 ? (
+              /* Full 4-column hero: 2 left | 1 center large | 2 right */
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-auto lg:h-[550px]">
+                <div className="grid grid-rows-2 gap-4 lg:col-span-1 h-[550px] lg:h-full">
+                  {heroArticles.slice(0, 2).map((a) => (
+                    <HeroCard key={a._id} article={a} />
+                  ))}
+                </div>
+                <div className="lg:col-span-2 h-[550px] lg:h-full">
+                  <HeroCardLarge article={heroArticles[2]} />
+                </div>
+                <div className="grid grid-rows-2 gap-4 lg:col-span-1 h-[550px] lg:h-full">
+                  {heroArticles.slice(3, 5).map((a) => (
+                    <HeroCard key={a._id} article={a} />
+                  ))}
+                </div>
+              </div>
+            ) : heroArticles.length >= 3 ? (
+              /* 3-4 articles: 1 left | 1 center large | 1-2 right */
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-auto lg:h-[500px]">
+                <div className="h-[300px] lg:h-full"><HeroCard article={heroArticles[0]} /></div>
+                <div className="h-[300px] lg:h-full"><HeroCardLarge article={heroArticles[1]} /></div>
+                <div className={`${heroArticles.length === 4 ? "grid grid-rows-2 gap-4" : ""} h-[300px] lg:h-full`}>
+                  {heroArticles.slice(2).map((a) => (<HeroCard key={a._id} article={a} />))}
+                </div>
+              </div>
+            ) : (
+              /* 1-2 articles */
+              <div className={`grid grid-cols-1 ${heroArticles.length === 2 ? "lg:grid-cols-2" : ""} gap-4 h-auto lg:h-[450px]`}>
+                {heroArticles.map((a) => (
+                  <div key={a._id} className="h-[350px] lg:h-full"><HeroCardLarge article={a} /></div>
                 ))}
               </div>
-              {/* Center large */}
-              <div className="lg:col-span-2 h-[550px] lg:h-full">
-                {heroArticles[2] && (
-                  <Link href={`/article/${heroArticles[2]._id}`} className="relative group overflow-hidden block h-full bg-[#052616] border border-white/5 rounded-lg shadow-xl">
-                    <img src={img(heroArticles[2].image)} alt={heroArticles[2].title} className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent flex flex-col justify-end p-8 md:p-12">
-                      <span className="bg-green-600 text-white text-[11px] font-black uppercase px-3 py-1.5 w-max mb-5 tracking-widest rounded-md border border-green-400/30">{heroArticles[2].category}</span>
-                      <h2 className="text-white text-xl sm:text-3xl md:text-5xl font-black leading-[1.05] group-hover:text-green-400 transition-colors mb-4">{heroArticles[2].title}</h2>
-                      <div className="flex items-center gap-4">
-                        <span className="text-white font-black text-xs flex items-center gap-2 bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
-                          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                          {heroArticles[2].date}
-                        </span>
-                        <span className="text-white/40 text-[11px] font-black uppercase tracking-[0.15em]">Sugar Times</span>
-                      </div>
-                    </div>
-                  </Link>
-                )}
-              </div>
-              {/* Right 2 stacked */}
-              <div className="grid grid-rows-2 gap-4 lg:col-span-1 h-[550px] lg:h-full">
-                {heroArticles.slice(3, 5).map((a) => (
-                  <Link key={a._id} href={`/article/${a._id}`} className="relative group overflow-hidden block h-full bg-[#052616] border border-white/5 rounded-lg shadow-lg">
-                    <img src={img(a.image)} alt={a.title} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-5">
-                      <h3 className="text-white text-[16px] font-black leading-snug group-hover:text-green-400 transition-colors line-clamp-3">{a.title}</h3>
-                      <div className="flex items-center gap-2 mt-2.5">
-                        <span className="text-emerald-400 text-[10px] uppercase font-black tracking-widest">{a.category}</span>
-                        <span className="w-1 h-1 rounded-full bg-white/30" />
-                        <span className="text-white/50 text-[10px] font-bold">{a.date}</span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
+            )}
           </div>
         </section>
       )}
@@ -384,21 +421,37 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {/* Magazine */}
-          {magazines[0] && (
-            <div className="bg-[#b5cc95] p-5 flex flex-col items-center text-center shadow-inner relative overflow-hidden group">
-              <div className="absolute top-2 left-2 text-[#4d6a26] font-black text-2xl uppercase opacity-20 transform -rotate-12 pointer-events-none">Sugar<br/>Times</div>
-              <Link href="/magazines" className="block relative z-10 w-full flex justify-center py-6">
-                <div className="relative w-48 -rotate-[8deg] group-hover:-rotate-[5deg] transition-transform duration-500 shadow-2xl z-20">
-                  <img src={img(magazines[0].cover)} alt="Magazine" className="w-full border-4 border-white" />
-                </div>
-                {magazines[1] && (
-                  <div className="absolute w-44 rotate-[5deg] right-2 top-10 opacity-60 z-10 hidden sm:block">
-                    <img src={img(magazines[1].cover)} alt="" className="w-full border-4 border-white" />
+          {/* Magazines — Latest to oldest */}
+          {magazines.length > 0 && (
+            <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+              <div className="bg-[#b5cc95] p-6 text-center relative overflow-hidden">
+                <div className="absolute top-2 left-2 text-[#4d6a26] font-black text-2xl uppercase opacity-15 transform -rotate-12 pointer-events-none">Sugar<br/>Times</div>
+                <Link href="/magazines" className="block relative z-10">
+                  <div className="w-40 mx-auto shadow-2xl border-4 border-white rounded-sm overflow-hidden">
+                    <img src={img(magazines[0].cover)} alt={magazines[0].title} className="w-full h-auto object-cover" />
                   </div>
-                )}
+                </Link>
+                <h3 className="font-bold text-slate-800 text-lg mt-4 relative z-10">Latest Issue</h3>
+                <p className="text-slate-600 text-xs mt-1 relative z-10">{magazines[0].title}</p>
+              </div>
+              {magazines.length > 1 && (
+                <div className="p-4 space-y-3">
+                  {magazines.slice(1, 4).map((m) => (
+                    <Link key={m._id} href="/magazines" className="group flex gap-3 items-center">
+                      <div className="w-12 h-16 shrink-0 bg-slate-100 border border-slate-200 rounded overflow-hidden">
+                        <img src={img(m.cover)} alt={m.title} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-[12px] font-bold text-slate-700 line-clamp-2 group-hover:text-green-600 transition-colors">{m.title}</h4>
+                        <span className="text-[10px] text-slate-400">{m.pages} pages {m.premium ? "• Premium" : "• Free"}</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+              <Link href="/magazines" className="block text-center py-3 text-xs font-bold text-green-600 hover:bg-green-50 border-t border-slate-100 transition-colors">
+                View All Magazines <ChevronRight size={12} className="inline" />
               </Link>
-              <h3 className="font-medium text-slate-800 text-xl tracking-wide z-20 mt-2 mb-2">Latest Issue</h3>
             </div>
           )}
 

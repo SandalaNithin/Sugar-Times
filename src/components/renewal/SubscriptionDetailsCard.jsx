@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, CheckCircle2, Clock, User, CreditCard, Calendar, MapPin, Phone, Mail } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, User, CreditCard, Calendar, MapPin, Phone, Mail, Building, Map, Hash, Star } from "lucide-react";
 
 const STATUS_CONFIG = {
   active: {
@@ -40,6 +40,15 @@ function getStatusKey(status) {
   return "expired";
 }
 
+const PLAN_LABELS = {
+  "1year": "1 Year",
+  "2year": "2 Years",
+  "3year": "3 Years",
+  "life": "Lifetime",
+  "monthly": "Monthly",
+  "yearly": "Yearly",
+};
+
 export default function SubscriptionDetailsCard({ subscription }) {
   const formatDate = (date) => {
     if (!date) return "N/A";
@@ -55,17 +64,22 @@ export default function SubscriptionDetailsCard({ subscription }) {
   const StatusIcon = config.icon;
 
   const fields = [
-    { icon: CreditCard, label: "Member No.", value: subscription.memberNumber },
-    { icon: User, label: "Name", value: subscription.name },
+    { icon: CreditCard, label: "Member No.", value: subscription.memberNumber || subscription._id },
+    { icon: User, label: "Name", value: subscription.name || subscription.subscriberName },
+    { icon: Star, label: "Plan", value: PLAN_LABELS[subscription.plan] || subscription.plan, bold: true },
     {
       icon: CreditCard,
       label: "Subscription Type",
       value: subscription.subscriptionType === "print" ? "Print / Courier" : "E-Magazine / Digital",
     },
+    { icon: Calendar, label: "Start Date", value: formatDate(subscription.startDate) },
     { icon: Calendar, label: "Valid Upto", value: formatDate(subscription.validUpto || subscription.endDate), bold: true },
-    { icon: MapPin, label: "Delivery Address", value: subscription.deliveryAddress || "N/A" },
-    { icon: Phone, label: "Registered Mobile", value: subscription.registeredMobile },
-    { icon: Mail, label: "Registered Email", value: subscription.registeredEmail },
+    { icon: MapPin, label: "Delivery Address", value: subscription.deliveryAddress || subscription.address },
+    { icon: Building, label: "District", value: subscription.district },
+    { icon: Map, label: "State", value: subscription.state },
+    { icon: Hash, label: "Pincode", value: subscription.pincode },
+    { icon: Phone, label: "Registered Mobile", value: subscription.registeredMobile || subscription.mobile },
+    { icon: Mail, label: "Registered Email", value: subscription.registeredEmail || subscription.email },
   ];
 
   return (
@@ -87,18 +101,20 @@ export default function SubscriptionDetailsCard({ subscription }) {
         <div className="bg-white/70 rounded-xl border border-slate-200/60 overflow-hidden">
           {fields.map((field, idx) => {
             const Icon = field.icon;
+            const val = field.value;
+            if (!val && val !== 0) return null;
             return (
               <div
                 key={idx}
                 className={`flex items-start gap-4 px-5 py-3.5 ${idx !== fields.length - 1 ? "border-b border-slate-100" : ""} hover:bg-white/80 transition-colors`}
               >
-                <Icon className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
+                <Icon className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
                 <div className="w-36 flex-shrink-0">
                   <span className="text-xs uppercase font-bold text-slate-400 tracking-wide">{field.label}</span>
                 </div>
                 <div className="flex-1">
                   <span className={`text-sm ${field.bold ? "font-black text-slate-900" : "font-medium text-slate-700"}`}>
-                    {field.value || "N/A"}
+                    {val}
                   </span>
                 </div>
               </div>

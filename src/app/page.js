@@ -184,6 +184,40 @@ function HeroCardLarge({ article: a }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   CATEGORY HERO CARDS — per-category hero grid (new to old)
+   ═══════════════════════════════════════════════════════════════════════════ */
+function CategoryHeroCard({ article: a, palette: p }) {
+  return (
+    <Link href={`/article/${a._id}`} className="relative group overflow-hidden block h-full bg-slate-900 rounded-lg">
+      <img src={img(a.image)} alt={a.title} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4">
+        <h3 className="text-white text-[14px] font-bold leading-snug group-hover:text-green-400 transition-colors line-clamp-2">{a.title}</h3>
+        <div className="flex items-center gap-2 mt-2">
+          <span className={`${p.pill} text-[9px] font-bold px-1.5 py-0.5 rounded-full`}>{a.subcategory || a.category}</span>
+          <span className="text-white/40 text-[9px]">{a.date}</span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function CategoryHeroLarge({ article: a, palette: p }) {
+  return (
+    <Link href={`/article/${a._id}`} className="relative group overflow-hidden block h-full bg-slate-900 rounded-lg">
+      <img src={img(a.image)} alt={a.title} className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-6 md:p-8">
+        <span className={`${p.bg} text-white text-[10px] font-bold uppercase px-2.5 py-1 w-max mb-3 tracking-wider rounded`}>{a.subcategory || a.category}</span>
+        <h2 className="text-white text-lg sm:text-2xl md:text-3xl font-black leading-tight group-hover:text-green-400 transition-colors mb-2 line-clamp-3">{a.title}</h2>
+        <div className="flex items-center gap-3">
+          <span className="text-white/70 text-[11px] font-bold">{a.date}</span>
+          <span className="text-white/30 text-[10px]">Sugar Times</span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    PAGE COMPONENT
    ═══════════════════════════════════════════════════════════════════════════ */
 export default async function HomePage() {
@@ -264,8 +298,8 @@ export default async function HomePage() {
           {sections.map((section, idx) => {
             const p = PALETTES[idx % PALETTES.length];
             const hasArticles = section.allArticles.length > 0;
-            const featured = section.allArticles[0];
-            const rest = section.allArticles.slice(1, 5);
+            const heroItems = section.allArticles.slice(0, 5);
+            const listItems = section.allArticles.slice(5, 9);
             const childrenWithArticles = section.childSections.filter((c) => c.articles.length > 0);
             const categoryLink = `/news?category=${encodeURIComponent(section.name)}`;
 
@@ -299,43 +333,66 @@ export default async function HomePage() {
                   </div>
                 )}
 
-                {/* ── Articles for this parent ────────────────────────── */}
+                {/* ── Category Hero — newest articles grid ─────────────── */}
                 {hasArticles ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Featured (large left) */}
-                    {featured && (
-                      <Link href={`/article/${featured._id}`} className="group block">
-                        <div className="overflow-hidden mb-4 bg-slate-100 h-64 relative rounded-lg">
-                          <img src={img(featured.image)} alt={featured.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                          <span className={`absolute bottom-0 left-0 ${p.bg} text-white text-[10px] font-bold uppercase px-2.5 py-1`}>{featured.subcategory || featured.category}</span>
+                  <>
+                    {heroItems.length >= 5 ? (
+                      /* Full hero: 2 left | 1 center large | 2 right */
+                      <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 h-auto lg:h-[400px] rounded-xl overflow-hidden">
+                        <div className="grid grid-rows-2 gap-3 lg:col-span-1 h-[400px] lg:h-full">
+                          {heroItems.slice(0, 2).map((a) => (
+                            <CategoryHeroCard key={a._id} article={a} palette={p} />
+                          ))}
                         </div>
-                        <h3 className={`text-[20px] font-bold leading-tight text-slate-800 group-hover:${p.text} transition-colors mb-2`}>{featured.title}</h3>
-                        <div className="text-xs text-slate-500 mb-2 font-semibold">
-                          <span className="text-slate-900 font-bold">{featured.author}</span> — {featured.date}
+                        <div className="lg:col-span-2 h-[400px] lg:h-full">
+                          <CategoryHeroLarge article={heroItems[2]} palette={p} />
                         </div>
-                        {featured.excerpt && <p className="text-[14px] text-slate-500 leading-relaxed font-medium line-clamp-3">{featured.excerpt}</p>}
-                      </Link>
+                        <div className="grid grid-rows-2 gap-3 lg:col-span-1 h-[400px] lg:h-full">
+                          {heroItems.slice(3, 5).map((a) => (
+                            <CategoryHeroCard key={a._id} article={a} palette={p} />
+                          ))}
+                        </div>
+                      </div>
+                    ) : heroItems.length >= 3 ? (
+                      /* 3-4 articles */
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 h-auto lg:h-[350px] rounded-xl overflow-hidden">
+                        <div className="h-[250px] lg:h-full"><CategoryHeroCard article={heroItems[0]} palette={p} /></div>
+                        <div className="h-[250px] lg:h-full"><CategoryHeroLarge article={heroItems[1]} palette={p} /></div>
+                        <div className={`${heroItems.length === 4 ? "grid grid-rows-2 gap-3" : ""} h-[250px] lg:h-full`}>
+                          {heroItems.slice(2).map((a) => (<CategoryHeroCard key={a._id} article={a} palette={p} />))}
+                        </div>
+                      </div>
+                    ) : heroItems.length === 2 ? (
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 h-auto lg:h-[320px] rounded-xl overflow-hidden">
+                        {heroItems.map((a) => (
+                          <div key={a._id} className="h-[250px] lg:h-full"><CategoryHeroLarge article={a} palette={p} /></div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="h-[320px] rounded-xl overflow-hidden">
+                        <CategoryHeroLarge article={heroItems[0]} palette={p} />
+                      </div>
                     )}
-                    {/* List (right side) */}
-                    {rest.length > 0 && (
-                      <div className="space-y-4">
-                        {rest.map((a) => (
+
+                    {/* ── More articles list below hero ───────────────── */}
+                    {listItems.length > 0 && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                        {listItems.map((a) => (
                           <Link key={a._id} href={`/article/${a._id}`} className="group flex gap-4 items-start pb-4 border-b border-slate-100 last:border-0">
-                            <div className="w-[110px] h-[80px] shrink-0 bg-slate-100 overflow-hidden rounded-md">
+                            <div className="w-[100px] h-[70px] shrink-0 bg-slate-100 overflow-hidden rounded-md">
                               <img src={img(a.image)} alt={a.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <span className={`text-[10px] font-bold ${p.pill} px-2 py-0.5 rounded-full inline-block mb-1.5`}>{a.subcategory || a.category}</span>
-                              <h4 className={`text-[14px] font-bold text-slate-800 leading-snug group-hover:${p.text} transition-colors line-clamp-2`}>{a.title}</h4>
-                              <span className="text-[11px] text-slate-400 mt-1.5 block font-medium">{a.date}</span>
+                              <span className={`text-[10px] font-bold ${p.pill} px-2 py-0.5 rounded-full inline-block mb-1`}>{a.subcategory || a.category}</span>
+                              <h4 className="text-[13px] font-bold text-slate-800 leading-snug group-hover:text-green-600 transition-colors line-clamp-2">{a.title}</h4>
+                              <span className="text-[10px] text-slate-400 mt-1 block">{a.date}</span>
                             </div>
                           </Link>
                         ))}
                       </div>
                     )}
-                  </div>
+                  </>
                 ) : (
-                  /* Empty state for category with no articles yet */
                   <div className={`${p.light} rounded-xl p-8 text-center border border-slate-100`}>
                     <span className="text-3xl block mb-3">{section.emoji}</span>
                     <p className="text-sm text-slate-500 font-medium">No articles in <strong>{section.name}</strong> yet.</p>

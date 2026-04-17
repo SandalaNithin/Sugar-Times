@@ -8,6 +8,7 @@ const nextConfig = {
       { protocol: "https", hostname: "i.pravatar.cc" },
       { protocol: "http", hostname: "localhost" },
       { protocol: "https", hostname: "sugartimes.co.in" },
+      { protocol: "https", hostname: "st-be-kh3k.onrender.com" },
     ],
   },
 };

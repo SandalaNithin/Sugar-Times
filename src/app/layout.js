@@ -1,22 +1,38 @@
-"use client";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { AuthProvider } from "@/context/AuthContext";
-import { usePathname } from "next/navigation";
+import ClientLayout from "@/components/ClientLayout";
+
+export const metadata = {
+  title: "Sugar Times - Monthly News Magazine on Sugar and Biofuel industry",
+  description: "Sugar Times is a leading monthly magazine focusing on the sugar and biofuel industry since 2015. 12 issues per year.",
+  keywords: ["Sugar Industry", "Biofuel", "Ethanol", "Sugarcane Prices", "Sugar Times Magazine", "Industry News"],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://sugartimes.in", // Adjust to your actual domain
+  },
+  // Google Publisher / News specific
+  other: {
+    "google-site-verification": "YOUR_VERIFICATION_CODE_HERE", // User should replace this
+    "news_keywords": "Sugar, Ethanol, Biofuel, Energy, Agriculture",
+  }
+};
 
 export default function RootLayout({ children }) {
-  const pathname = usePathname();
-  const isTakeoverPage = pathname === "/about" || pathname?.startsWith("/login") || pathname?.startsWith("/register") || pathname?.startsWith("/admin");
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-slate-50 font-sans" suppressHydrationWarning>
-        <AuthProvider>
-          {!isTakeoverPage && <Navbar />}
-          <main className={isTakeoverPage ? "min-h-screen grow flex flex-col" : "grow flex flex-col"}>{children}</main>
-          {!isTakeoverPage && <Footer />}
-        </AuthProvider>
+        <ClientLayout>
+          {children}
+        </ClientLayout>
       </body>
     </html>
   );

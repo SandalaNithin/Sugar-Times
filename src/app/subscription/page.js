@@ -137,7 +137,7 @@ function loadRazorpayScript() {
    MAIN PAGE
 ═══════════════════════════════════════════════════════════════════════ */
 export default function SubscriptionPage() {
-  const { user, isSubscribed, fetchSubscription } = useAuth();
+  const { user, isSubscribed, fetchSubscription, guestRegister } = useAuth();
   const router = useRouter();
 
   const [subType, setSubType] = useState("print"); // "print" | "digital"
@@ -145,6 +145,7 @@ export default function SubscriptionPage() {
   const [processing, setProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [generatedCreds, setGeneratedCreds] = useState(null); // { email, password } for guest accounts
   const formRef = useRef(null);
 
   const handlePlanSelect = (key) => {
@@ -229,19 +230,25 @@ export default function SubscriptionPage() {
     e.preventDefault();
     setError("");
 
-    if (!user) { router.push("/login"); return; }
-
     const planObj = PLANS.find((p) => p.key === form.plan);
     if (!planObj) { setError("Please select a plan."); return; }
 
     const amount = subType === "print" ? planObj.printPrice : planObj.digitalPrice;
 
     setProcessing(true);
+
     try {
+      // ── Basic validation ──────────────────────────────────────────────
+      if (!user && (!form.subscriberName || !form.email)) {
+        setError("Please fill in your name and email to proceed.");
+        setProcessing(false);
+        return;
+      }
+
       const loaded = await loadRazorpayScript();
       if (!loaded) throw new Error("Razorpay SDK failed to load. Check your connection.");
 
-      // 1. Create Razorpay order on backend
+      // 1. Create Razorpay order on backend (Supports guests)
       const { data: orderData } = await paymentsAPI.createOrder({ amount, currency: "INR" });
 
       // 2. Open Razorpay Checkout
@@ -274,15 +281,28 @@ export default function SubscriptionPage() {
               });
 
               // 4. Create subscription record with all form data
-              await subscriptionsAPI.create({
+              // This now handles auto-registration on the backend if the user is a guest.
+              const subsResponse = await subscriptionsAPI.create({
                 ...form,
                 paymentId: response.razorpay_payment_id,
                 razorpayOrderId: response.razorpay_order_id,
                 razorpayPaymentId: response.razorpay_payment_id,
               });
 
-              // 5. Refresh auth subscription status
-              await fetchSubscription(user.id);
+              // 5. If a new account was created, show credentials
+              if (subsResponse.data?.isNewUser && subsResponse.data?.generatedPassword) {
+                setGeneratedCreds({ 
+                  email: form.email, 
+                  password: subsResponse.data.generatedPassword 
+                });
+              }
+
+              // 6. Refresh auth subscription status (using userId returned from backend if guest)
+              const finalUserId = user?.id || user?._id || subsResponse.data?.subscription?.userId;
+              if (finalUserId) {
+                await fetchSubscription(finalUserId);
+              }
+              
               resolve();
               setSuccess(true);
             } catch (err) {
@@ -290,26 +310,25 @@ export default function SubscriptionPage() {
             }
           },
           modal: {
-            ondismiss: () => reject(new Error("Payment cancelled by user.")),
+            ondismiss: () => reject(new Error("Payment cancelled.")),
           },
           onerror: async (error) => {
-            // Handle payment rejection/error from Razorpay
             try {
               await paymentsAPI.handleFailure({
                 razorpay_order_id: error.metadata?.order_id || orderData.orderId,
                 error_code: error.code || "UNKNOWN_ERROR",
-                error_description: error.description || "Payment was rejected by Razorpay",
+                error_description: error.description || "Payment failed",
               });
             } catch (err) {
-              console.error("Failed to record payment failure:", err);
+              console.error("Failed to record failure:", err);
             }
-            reject(new Error(error.description || "Payment failed. Please try again."));
+            reject(new Error(error.description || "Payment failed."));
           },
         });
         rzp.open();
       });
     } catch (err) {
-      setError(err?.response?.data?.message || err.message || "Payment failed. Please try again.");
+      setError(err?.response?.data?.message || err.message || "Something went wrong. Please try again.");
     } finally {
       setProcessing(false);
     }
@@ -325,9 +344,52 @@ export default function SubscriptionPage() {
           </div>
           <h2 className="text-3xl font-black text-slate-900 mb-2">You&apos;re subscribed!</h2>
           <p className="text-slate-500 mb-2">Welcome to the Sugar Times family.</p>
-          <p className="text-sm text-slate-400 mb-8">
+          <p className="text-sm text-slate-400 mb-6">
             Your magazine will be delivered as per your selected plan. Check your email for confirmation.
           </p>
+
+          {/* Show generated credentials for guest users */}
+          {generatedCreds && (
+            <div className="mb-6 bg-amber-50 border border-amber-200 rounded-2xl p-5 text-left">
+              <div className="flex items-center gap-2 mb-3">
+                <Shield className="w-5 h-5 text-amber-600" />
+                <span className="text-sm font-black text-amber-800">Your Account Credentials</span>
+              </div>
+              <p className="text-xs text-amber-700 mb-3">
+                An account has been created for you automatically. Please save these credentials to manage your subscription.
+              </p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between bg-white rounded-xl px-4 py-2.5 border border-amber-200">
+                  <span className="text-xs font-semibold text-slate-500 uppercase">Email</span>
+                  <span className="text-sm font-bold text-slate-900 font-mono">{generatedCreds.email}</span>
+                </div>
+                <div className="flex items-center justify-between bg-white rounded-xl px-4 py-2.5 border border-amber-200">
+                  <span className="text-xs font-semibold text-slate-500 uppercase">Password</span>
+                  <span className="text-sm font-bold text-slate-900 font-mono">{generatedCreds.password}</span>
+                </div>
+              </div>
+              
+              <div className="mt-4 pt-4 border-t border-amber-200">
+                <a 
+                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                    `Sugar Times Subscription Confirmation\n\nYour account has been created!\nEmail: ${generatedCreds.email}\nPassword: ${generatedCreds.password}\n\nLogin: https://sugartimes.co.in/login`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-2.5 rounded-xl text-sm font-bold transition-colors"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  Save to WhatsApp
+                </a>
+              </div>
+
+              <p className="text-[11px] text-amber-600 mt-3 flex items-center gap-1">
+                <Mail className="w-3 h-3" />
+                A copy has also been sent to your email.
+              </p>
+            </div>
+          )}
+
           <Link href="/dashboard"
             className="block w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-2xl transition-colors text-center">
             Go to Dashboard →
@@ -355,19 +417,19 @@ export default function SubscriptionPage() {
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-3">
-            चीनी उद्योग की<br />
-            <span className="text-emerald-300">एकमात्र हिन्दी</span> मासिक पत्रिका
+            Monthly News Magazine on<br />
+            <span className="text-emerald-300">Sugar and Biofuel</span> Industry
           </h1>
           <p className="text-lg md:text-xl text-emerald-100 mb-2 font-medium">
-            India&apos;s Only Monthly Magazine for the Sugar Industry &amp; Sugarcane Farmers
+            India&apos;s Leading Publication for the Sugar, Ethanol &amp; Bio-Energy Sector
           </p>
 
           {/* Stats row */}
           <div className="flex flex-wrap justify-center gap-6 mt-10">
             {[
               { value: "10,700+", label: "Subscribers across India" },
-              { value: "30+", label: "Years of publication" },
-              { value: "36+", label: "Issues per year" },
+              { value: "Since 2015", label: "Established" },
+              { value: "12", label: "Issues per year" },
             ].map((s) => (
               <div key={s.label} className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-6 py-4 text-center min-w-[130px]">
                 <div className="text-2xl font-black text-emerald-300">{s.value}</div>
@@ -647,8 +709,7 @@ export default function SubscriptionPage() {
               {!user && (
                 <span>
                   {" "}·{" "}
-                  <Link href="/login" className="text-emerald-600 underline font-medium">Login</Link>{" "}
-                  required to pay
+                  Account created automatically at checkout
                 </span>
               )}
             </p>

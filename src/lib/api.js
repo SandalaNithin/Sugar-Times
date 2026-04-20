@@ -4,6 +4,7 @@ import axiosInstance from "./axiosInstance";
 export const authAPI = {
   login: (data) => axiosInstance.post("/auth/login", data),
   register: (data) => axiosInstance.post("/auth/register", data),
+  guestRegister: (data) => axiosInstance.post("/auth/guest-register", data),
 };
 
 // ─── Articles ────────────────────────────────────────────────────────────────
@@ -62,6 +63,7 @@ export const adminAPI = {
   getUsers: (params) => axiosInstance.get("/admin/users", { params }),
   createUser: (data) => axiosInstance.post("/admin/users", data),
   updateUser: (id, data) => axiosInstance.put(`/admin/users/${id}`, data),
+  getUserSubscription: (userId) => axiosInstance.get(`/admin/users/${userId}/subscription`),
   deleteUser: (id) => axiosInstance.delete(`/admin/users/${id}`),
   getEnquiries: (params) => axiosInstance.get("/admin/enquiries", { params }),
   getSubscriptions: (params) => axiosInstance.get("/admin/subscriptions", { params }),
@@ -83,6 +85,7 @@ export const mediaAPI = {
   upload: (formData) => axiosInstance.post("/uploads-api", formData, {
     headers: { "Content-Type": "multipart/form-data" }
   }),
+  delete: (filename) => axiosInstance.delete(`/uploads-api/${filename}`),
 };
 
 // ─── Advertisements ──────────────────────────────────────────────────────────

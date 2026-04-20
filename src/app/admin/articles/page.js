@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import AdminLayout from "@/components/AdminLayout";
 import { articlesAPI, categoriesAPI } from "@/lib/api";
@@ -64,6 +64,8 @@ function ArticlesContent() {
   const [saving, setSaving] = useState(false);
   const [isDrafting, setIsDrafting] = useState(false);
   const [showMedia, setShowMedia] = useState(false);
+  const [mediaContext, setMediaContext] = useState("cover"); // "cover" or "inline"
+  const editorRef = useRef(null);
 
   const urlEditParam = searchParams.get("edit");
 
@@ -178,6 +180,26 @@ function ArticlesContent() {
       setSaving(false);
       setIsDrafting(false);
     }
+  };
+
+  const handleInlineImageClick = () => {
+    setMediaContext("inline");
+    setShowMedia(true);
+  };
+
+  const handleMediaSelect = (url) => {
+    if (mediaContext === "cover") {
+      setForm({ ...form, image: url });
+    } else {
+      // Insert into Quill editor
+      const quill = editorRef.current?.getEditor();
+      if (quill) {
+        const range = quill.getSelection(true);
+        quill.insertEmbed(range.index, "image", url);
+        quill.setSelection(range.index + 1);
+      }
+    }
+    setShowMedia(false);
   };
 
   const handleDelete = async (id) => {
@@ -303,7 +325,7 @@ function ArticlesContent() {
                   <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })}
                     placeholder="https://images.unsplash.com/..."
                     className="flex-1 px-5 py-4 border-2 border-slate-50 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-green-400/10 focus:border-green-500 bg-slate-50/50 transition-all" />
-                  <button type="button" onClick={() => setShowMedia(true)}
+                  <button type="button" onClick={() => { setMediaContext("cover"); setShowMedia(true); }}
                     className="px-6 py-4 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all flex items-center gap-2">
                     <LayoutGrid size={16} /> Explorer
                   </button>
@@ -320,8 +342,10 @@ function ArticlesContent() {
               <div>
                 <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">Extended Content <span className="text-red-500">*</span></label>
                 <RichTextEditor 
+                  ref={editorRef}
                   value={form.content} 
                   onChange={(val) => setForm({ ...form, content: val })}
+                  onImageUpload={handleInlineImageClick}
                   placeholder="Paste your full article text here. Use shifts for new lines..."
                 />
               </div>
@@ -348,7 +372,7 @@ function ArticlesContent() {
       <MediaExplorer 
         isOpen={showMedia} 
         onClose={() => setShowMedia(false)} 
-        onSelect={(url) => setForm({ ...form, image: url })} 
+        onSelect={handleMediaSelect} 
       />
 
       <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">

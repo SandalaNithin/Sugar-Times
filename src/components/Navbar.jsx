@@ -139,7 +139,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-white shadow-md font-sans">
 
       {/* Row 1: Tools & Branding (Centered Logo Layout) */}
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-2 flex flex-col sm:flex-row items-center justify-between bg-white border-b border-slate-50 relative min-h-[100px] gap-4 sm:gap-0">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-1 flex flex-col sm:flex-row items-center justify-between bg-white border-b border-slate-50 relative min-h-[74px] gap-4 sm:gap-0">
 
         {/* Left: Date Tools (Hidden on mobile for better space) */}
         <div className="hidden md:flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] w-1/3">
@@ -154,10 +154,10 @@ export default function Navbar() {
             <Image
               src="/sugar times main logo.png"
               alt="Sugar Times"
-              width={220}
-              height={80}
+              width={150}
+              height={46}
               priority
-              className="h-20 w-auto object-contain"
+              className="h-16 w-auto object-contain"
             />
           </Link>
         </div>
@@ -219,7 +219,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-6 h-14 flex items-center justify-between bg-white border-t border-slate-50">
+      <div className="max-w-[1400px] mx-auto px-6 h-9 flex items-center justify-between bg-white border-t border-slate-50">
         <div className="hidden lg:flex flex-1 items-center justify-center h-full lg:-translate-x-24">
           <nav className="flex items-center gap-1.5 h-full">
             {navLinks.map((link) => (

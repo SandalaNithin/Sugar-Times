@@ -47,8 +47,8 @@ const AUDIENCE = [
 
 const REACH_STATS = [
   { value: "10,700+", label: "Monthly Copies", icon: Newspaper },
-  { value: "61,453+", label: "YouTube Subscribers", icon: Users },
-  { value: "16,985+", label: "Facebook Followers", icon: Share2 },
+  { value: "9,800+", label: "YouTube Subscribers", icon: Users },
+  { value: "5,700+", label: "Facebook Followers", icon: Share2 },
   { value: "#1", label: "Hindi Sugar Monthly", icon: Award },
 ];
 
@@ -311,36 +311,28 @@ export default function AdvertisePage() {
         </div>
       </section>
 
-      {/* REGULAR ADVERTISERS */}
+      {/* OUR PATRONS */}
       <section className="max-w-6xl mx-auto px-4 py-16">
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 text-emerald-700 text-xs font-bold uppercase tracking-[0.2em] mb-3">
             <Award className="w-4 h-4" />
             Trusted By Industry Leaders
           </div>
-          <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-3">Our Regular Advertisers</h2>
-          <p className="text-slate-500 text-sm md:text-base">Brands that rely on Sugar Times to reach the sugar & bio-energy ecosystem</p>
+          <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-3">Our Patrons</h2>
+          <p className="text-slate-500 text-sm md:text-base">Leading brands and organizations that support Sugar Times</p>
         </div>
 
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-lg overflow-hidden mb-6">
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-lg overflow-hidden">
           <div className="relative w-full h-auto">
             <Image
-              src="/Our Regular Advertisers.jpg"
-              alt="Sugar Times Regular Advertisers"
+              src="/SED logo.jpg"
+              alt="SED — Spray Engineering Devices, Our Patron"
               width={1400}
               height={700}
-              className="w-full h-auto object-contain"
+              className="w-full h-auto object-contain p-8 md:p-12"
               priority
             />
           </div>
-        </div>
-
-        <div className="flex flex-wrap gap-2 justify-center">
-          {ADVERTISERS.map((brand) => (
-            <span key={brand} className="px-4 py-2 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-700 hover:border-emerald-400 hover:text-emerald-700 transition-colors">
-              {brand}
-            </span>
-          ))}
         </div>
       </section>
 

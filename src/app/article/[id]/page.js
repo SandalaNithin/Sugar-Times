@@ -117,7 +117,7 @@ export default async function ArticlePage({ params }) {
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
 
           {/* Main Content */}
-          <main className="w-full lg:flex-1 lg:min-w-0 lg:max-w-[820px] order-1">
+          <main className="w-full lg:flex-1 lg:min-w-0 lg:max-w-[820px] order-1 bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-100">
             <header className="mb-8">
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 {article.category && (
@@ -143,19 +143,19 @@ export default async function ArticlePage({ params }) {
                 )}
               </div>
 
-              <h1 className="text-[24px] sm:text-[28px] md:text-[36px] lg:text-[40px] font-black text-slate-900 leading-[1.15] mb-6 tracking-tight break-words">
+              <h1 className="text-[28px] sm:text-[32px] md:text-[40px] lg:text-[44px] font-black text-slate-900 leading-[1.1] mb-6 tracking-tight break-words">
                 {article.title}
               </h1>
 
-              <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-4 py-4 border-y border-slate-100 mb-8">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-4 py-6 border-y border-slate-100 mb-8">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-inner">
+                    <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest leading-none mb-1">
+                    <p className="text-[11px] text-slate-400 uppercase font-black tracking-widest leading-none mb-1.5">
                       By <span className="text-slate-900">{article.author || "Sugar Times Team"}</span>
                     </p>
                     <p className="text-xs font-bold text-slate-500">{dynamicDate}</p>
@@ -167,92 +167,101 @@ export default async function ArticlePage({ params }) {
             </header>
 
             {/* Cover */}
-            <figure className="mb-10 group relative">
-              <div className="overflow-hidden rounded-xl bg-slate-100 shadow-2xl">
+            <figure className="mb-12 group relative">
+              <div className="overflow-hidden rounded-2xl bg-slate-100 shadow-2xl">
                 <img
                   src={getImageUrl(article.image)}
                   alt={article.title}
                   className="w-full h-auto aspect-[16/9] object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
                 />
               </div>
-              <figcaption className="text-[11px] text-slate-400 mt-4 italic text-right font-medium">
+              <figcaption className="text-[11px] text-slate-400 mt-4 italic text-right font-medium px-2">
                 Source: Sugar Times
               </figcaption>
             </figure>
 
             {/* Content */}
-            <div className="prose prose-slate prose-base sm:prose-lg max-w-none break-words prose-headings:font-black prose-headings:text-slate-900 prose-p:text-slate-700 prose-p:leading-relaxed prose-p:font-medium prose-a:text-green-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:w-full prose-img:h-auto">
+            <div className="prose prose-slate prose-base sm:prose-lg max-w-none break-words 
+              prose-headings:font-black prose-headings:text-slate-900 prose-headings:tracking-tight 
+              prose-p:text-slate-700 prose-p:leading-[1.8] prose-p:font-medium prose-p:mb-8
+              prose-a:text-emerald-600 prose-a:font-bold prose-a:no-underline hover:prose-a:underline 
+              prose-img:rounded-2xl prose-img:shadow-lg prose-img:w-full prose-img:h-auto
+              prose-blockquote:border-l-4 prose-blockquote:border-emerald-500 prose-blockquote:bg-emerald-50/30 prose-blockquote:px-6 prose-blockquote:py-2 prose-blockquote:rounded-r-xl prose-blockquote:italic
+              prose-li:text-slate-700 prose-li:font-medium">
               {article.premium ? (
                 <div className="relative">
                   <div className="opacity-40 select-none pointer-events-none" dangerouslySetInnerHTML={{ __html: (article.content || "").slice(0, 400) }} />
                   <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent flex items-center justify-center pt-20">
-                    <div className="bg-white border-2 border-green-500 rounded-3xl p-8 max-w-md text-center shadow-2xl translate-y-10">
-                      <Lock size={32} className="text-green-500 mx-auto mb-4" />
+                    <div className="bg-white border-2 border-emerald-500 rounded-3xl p-8 max-w-md text-center shadow-2xl translate-y-10">
+                      <Lock size={32} className="text-emerald-500 mx-auto mb-4" />
                       <h3 className="text-xl font-black text-slate-900 mb-3 uppercase tracking-tight">Premium Intelligence</h3>
                       <p className="text-sm text-slate-500 mb-6 leading-relaxed">This report is reserved for premium subscribers.</p>
-                      <Link href="/subscription" className="inline-block bg-green-500 hover:bg-green-600 text-white font-black text-xs uppercase tracking-widest px-8 py-4 rounded-xl shadow-lg shadow-green-500/30 transition-all">Go Premium</Link>
+                      <Link href="/subscription" className="inline-block bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-widest px-8 py-4 rounded-xl shadow-lg shadow-emerald-500/30 transition-all">Go Premium</Link>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div dangerouslySetInnerHTML={{ __html: article.content || "" }} />
+                <div dangerouslySetInnerHTML={{ __html: article.content || "" }} className="article-content-body" />
               )}
             </div>
 
             {/* Middle In-Article Advertisement */}
             {middleAds.length > 0 && (
-              <div className="my-10">
+              <div className="my-14">
                 <ArticleInlineAd ad={middleAds[0]} />
               </div>
             )}
 
             {/* Bottom Share */}
-            <div className="mt-10 pt-6 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
-              <span className="text-xs font-black uppercase tracking-widest text-slate-500">Share this article</span>
+            <div className="mt-12 pt-8 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Share this article</span>
               <ArticleShareBar url={shareUrl} title={article.title} />
             </div>
 
             {/* Previous / Next */}
             {(prev || next) && (
-              <div className="mt-8 grid sm:grid-cols-2 gap-4">
+              <div className="mt-10 grid sm:grid-cols-2 gap-6">
                 {prev ? (
-                  <Link href={`/article/${prev._id || prev.id}`} className="group p-5 rounded-2xl border border-slate-100 bg-white hover:border-emerald-300 hover:shadow-lg transition-all">
-                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
-                      <ChevronLeft size={12} /> Previous Article
+                  <Link href={`/article/${prev._id || prev.id}`} className="group p-6 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-emerald-300 hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">
+                      <ChevronLeft size={12} className="group-hover:-translate-x-1 transition-transform" /> Previous Article
                     </div>
-                    <p className="text-sm font-bold text-slate-800 group-hover:text-emerald-600 line-clamp-2">{prev.title}</p>
+                    <p className="text-sm font-bold text-slate-800 group-hover:text-emerald-600 line-clamp-2 leading-relaxed">{prev.title}</p>
                   </Link>
                 ) : <div />}
                 {next ? (
-                  <Link href={`/article/${next._id || next.id}`} className="group p-5 rounded-2xl border border-slate-100 bg-white hover:border-emerald-300 hover:shadow-lg transition-all text-right">
-                    <div className="flex items-center justify-end gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
-                      Next Article <ArrowRight size={12} />
+                  <Link href={`/article/${next._id || next.id}`} className="group p-6 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-emerald-300 hover:shadow-xl transition-all duration-300 text-right">
+                    <div className="flex items-center justify-end gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">
+                      Next Article <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
                     </div>
-                    <p className="text-sm font-bold text-slate-800 group-hover:text-emerald-600 line-clamp-2">{next.title}</p>
+                    <p className="text-sm font-bold text-slate-800 group-hover:text-emerald-600 line-clamp-2 leading-relaxed">{next.title}</p>
                   </Link>
                 ) : <div />}
               </div>
             )}
 
             {/* Author Card */}
-            <div className="mt-10 flex items-start gap-4 p-6 rounded-2xl bg-white border border-slate-100">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-black text-xl shrink-0">
+            <div className="mt-12 flex items-start gap-5 p-8 rounded-2xl bg-slate-50 border border-slate-100">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-black text-2xl shrink-0 shadow-lg shadow-emerald-500/20">
                 {(article.author || "S")[0].toUpperCase()}
               </div>
               <div>
-                <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">By</div>
-                <h4 className="text-lg font-black text-slate-900">{article.author || "Sugar Times Team"}</h4>
-                <p className="text-sm text-slate-500 mt-1">
-                  Covering India&apos;s sugar &amp; bio-energy industry — market news, policy, and farmer updates.
+                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1.5">Authorized Contributor</div>
+                <h4 className="text-xl font-black text-slate-900 mb-2">{article.author || "Sugar Times Team"}</h4>
+                <p className="text-sm text-slate-600 leading-relaxed max-w-lg">
+                  Covering India&apos;s sugar &amp; bio-energy industry — market news, policy updates, and agricultural intelligence for the industry.
                 </p>
               </div>
             </div>
 
             {/* Related Articles */}
             {related.length > 0 && (
-              <div className="mt-12 pt-10 border-t-4 border-slate-900">
-                <div className="inline-block mb-8 -mt-[44px]">
-                  <h2 className="bg-slate-900 text-white text-[13px] font-black uppercase tracking-[0.2em] px-4 py-2">Related Articles</h2>
+              <div className="mt-16 pt-12 border-t-2 border-slate-100">
+                <div className="inline-block mb-10">
+                  <h2 className="text-slate-900 text-2xl font-black uppercase tracking-tight flex items-center gap-3">
+                    <span className="w-8 h-1 bg-emerald-500 block"></span>
+                    Related Intelligence
+                  </h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {related.map((a) => (
@@ -263,11 +272,13 @@ export default async function ArticlePage({ params }) {
             )}
 
             {/* Leave a Reply */}
-            <ArticleCommentForm articleId={article._id || article.id} />
+            <div className="mt-16">
+              <ArticleCommentForm articleId={article._id || article.id} />
+            </div>
           </main>
 
           {/* Sidebar — fixed rail on desktop, stacks on mobile */}
-          <div className="w-full lg:w-[320px] lg:flex-shrink-0 order-2">
+          <div className="w-full lg:w-[320px] lg:flex-shrink-0 order-2 lg:sticky lg:top-24 self-start">
             <ArticleSidebar popular={popular} ads={sidebarAds} />
           </div>
         </div>

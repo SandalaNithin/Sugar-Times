@@ -61,11 +61,30 @@ export function AuthProvider({ children }) {
     setSubscription(null);
   };
 
+  const guestRegister = async (name, email) => {
+    const { data } = await authAPI.guestRegister({ name, email });
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    setUser(data.user);
+    setLoading(false);
+    return data; // Returns { token, user, generatedPassword }
+  };
+
+  const updateLocalUser = (updates) => {
+    if (!user) return;
+    const updated = { ...user, ...updates };
+    setUser(updated);
+    localStorage.setItem("user", JSON.stringify(updated));
+  };
+
   const isAdmin = user?.role === "admin";
   const isSubscribed = !!subscription;
 
   return (
-    <AuthContext.Provider value={{ user, subscription, loading, isAdmin, isSubscribed, login, register, logout, fetchSubscription }}>
+    <AuthContext.Provider value={{ 
+      user, subscription, loading, isAdmin, isSubscribed, 
+      login, register, logout, fetchSubscription, guestRegister, updateLocalUser 
+    }}>
       {children}
     </AuthContext.Provider>
   );

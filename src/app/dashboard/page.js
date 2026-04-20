@@ -27,7 +27,7 @@ const PLAN_LABELS = {
 };
 
 export default function DashboardPage() {
-  const { user, subscription, loading: authLoading, logout, fetchSubscription } = useAuth();
+  const { user, subscription, loading: authLoading, logout, fetchSubscription, updateLocalUser } = useAuth();
   const [articles, setArticles] = useState([]);
   const [magazines, setMagazines] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +35,7 @@ export default function DashboardPage() {
   const [saving, setSaving] = useState(false);
   const [flipbook, setFlipbook] = useState(null);
   const [editForm, setEditForm] = useState({
-    address: "", district: "", state: "", pincode: "", mobile: "", email: "",
+    subscriberName: "", address: "", district: "", state: "", pincode: "", mobile: "", email: "",
   });
   const router = useRouter();
 
@@ -47,6 +47,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (subscription) {
       setEditForm({
+        subscriberName: subscription.subscriberName || user?.name || "",
         address: subscription.address || "",
         district: subscription.district || "",
         state: subscription.state || "",
@@ -77,7 +78,7 @@ export default function DashboardPage() {
     if (!subscription?._id) return;
     setSaving(true);
     try {
-      await fetch(`${API_URL}/subscriptions/${subscription._id}`, {
+      const res = await fetch(`${API_URL}/subscriptions/${subscription._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -85,11 +86,23 @@ export default function DashboardPage() {
         },
         body: JSON.stringify(editForm),
       });
+
+      if (!res.ok) {
+        throw new Error("Server error - did you deploy the backend update?");
+      }
+
       toast.success("Profile updated!");
       setEditing(false);
+      
+      // Instantly synchronize the top-level User Profile name in the UI
+      if (editForm.subscriberName && editForm.subscriberName !== user?.name) {
+        updateLocalUser({ name: editForm.subscriberName });
+      }
+
       if (user?.id || user?._id) await fetchSubscription(user.id || user._id);
-    } catch {
-      toast.error("Failed to update profile");
+    } catch (err) {
+      toast.error("Failed to update profile: " + (err.message || ""));
+      console.error(err);
     } finally {
       setSaving(false);
     }
@@ -202,6 +215,7 @@ export default function DashboardPage() {
               {editing ? (
                 <div className="p-5 space-y-4">
                   {[
+                    { key: "subscriberName", label: "Name", icon: User },
                     { key: "address", label: "Address", icon: MapPin, type: "textarea" },
                     { key: "district", label: "District", icon: Building },
                     { key: "state", label: "State", icon: Map },

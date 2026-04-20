@@ -6,6 +6,7 @@ import NewsCard from "@/components/NewsCard";
 import { articlesAPI, categoriesAPI } from "@/lib/api";
 import { Search, Loader2, ChevronRight } from "lucide-react";
 import { CATEGORY_TREE } from "@/lib/categories";
+import { useLang } from "@/context/LanguageContext";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -23,6 +24,7 @@ const staticCategories = [
 const ARTICLES_PER_PAGE = 12;
 
 function NewsContent() {
+  const { t, tCategory } = useLang();
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category") || "All";
   const initialSearch = searchParams.get("search") || "";
@@ -111,9 +113,9 @@ function NewsContent() {
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-white text-xl sm:text-2xl font-black uppercase tracking-wider flex items-center gap-3">
                 <span className="w-1.5 h-8 bg-green-500 rounded-full" />
-                {category === "All" ? "Latest News" : category}
+                {category === "All" ? t("latest_news") : tCategory(category)}
               </h1>
-              <span className="text-emerald-400/60 text-xs font-bold uppercase tracking-widest">{total} articles</span>
+              <span className="text-emerald-400/60 text-xs font-bold uppercase tracking-widest">{total} {t("articles_count")}</span>
             </div>
 
             {heroArticles.length >= 5 ? (
@@ -125,7 +127,7 @@ function NewsContent() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4">
                         <h3 className="text-white text-[14px] font-bold leading-snug group-hover:text-green-400 transition-colors line-clamp-3">{a.title}</h3>
                         <div className="flex items-center gap-2 mt-2">
-                          <span className="text-emerald-400 text-[9px] uppercase font-bold tracking-widest">{a.subcategory || a.category}</span>
+                          <span className="text-emerald-400 text-[9px] uppercase font-bold tracking-widest">{tCategory(a.subcategory || a.category)}</span>
                           <span className="text-white/40 text-[9px]">{formatDate(a.createdAt)}</span>
                         </div>
                       </div>
@@ -136,7 +138,7 @@ function NewsContent() {
                   <Link href={`/article/${heroArticles[2]._id}`} className="relative group overflow-hidden block h-full bg-[#052616] border border-white/5 rounded-lg">
                     <img src={imgUrl(heroArticles[2].image)} alt={heroArticles[2].title} className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-800" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent flex flex-col justify-end p-6 md:p-10">
-                      <span className="bg-green-600 text-white text-[10px] font-bold uppercase px-3 py-1 w-max mb-3 tracking-widest rounded border border-green-400/30">{heroArticles[2].subcategory || heroArticles[2].category}</span>
+                      <span className="bg-green-600 text-white text-[10px] font-bold uppercase px-3 py-1 w-max mb-3 tracking-widest rounded border border-green-400/30">{tCategory(heroArticles[2].subcategory || heroArticles[2].category)}</span>
                       <h2 className="text-white text-xl sm:text-2xl md:text-4xl font-black leading-tight group-hover:text-green-400 transition-colors mb-3 line-clamp-3">{heroArticles[2].title}</h2>
                       <div className="flex items-center gap-3">
                         <span className="text-white/70 text-xs font-bold flex items-center gap-2 bg-black/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10">
@@ -154,7 +156,7 @@ function NewsContent() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4">
                         <h3 className="text-white text-[14px] font-bold leading-snug group-hover:text-green-400 transition-colors line-clamp-3">{a.title}</h3>
                         <div className="flex items-center gap-2 mt-2">
-                          <span className="text-emerald-400 text-[9px] uppercase font-bold tracking-widest">{a.subcategory || a.category}</span>
+                          <span className="text-emerald-400 text-[9px] uppercase font-bold tracking-widest">{tCategory(a.subcategory || a.category)}</span>
                           <span className="text-white/40 text-[9px]">{formatDate(a.createdAt)}</span>
                         </div>
                       </div>
@@ -169,7 +171,7 @@ function NewsContent() {
                     <Link href={`/article/${a._id}`} className="relative group overflow-hidden block h-full bg-[#052616] border border-white/5 rounded-lg">
                       <img src={imgUrl(a.image)} alt={a.title} className="absolute inset-0 w-full h-full object-cover opacity-65 group-hover:opacity-100 group-hover:scale-105 transition-all duration-600" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent flex flex-col justify-end p-5">
-                        <span className="bg-green-600 text-white text-[9px] font-bold uppercase px-2 py-0.5 w-max mb-2 rounded tracking-wider">{a.subcategory || a.category}</span>
+                        <span className="bg-green-600 text-white text-[9px] font-bold uppercase px-2 py-0.5 w-max mb-2 rounded tracking-wider">{tCategory(a.subcategory || a.category)}</span>
                         <h3 className={`text-white ${i === 1 ? "text-xl" : "text-[15px]"} font-bold leading-snug group-hover:text-green-400 transition-colors line-clamp-3`}>{a.title}</h3>
                         <span className="text-white/40 text-[10px] mt-2">{formatDate(a.createdAt)}</span>
                       </div>
@@ -184,7 +186,7 @@ function NewsContent() {
                     <Link href={`/article/${a._id}`} className="relative group overflow-hidden block h-full bg-[#052616] border border-white/5 rounded-lg">
                       <img src={imgUrl(a.image)} alt={a.title} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/25 to-transparent flex flex-col justify-end p-8">
-                        <span className="bg-green-600 text-white text-[10px] font-bold uppercase px-3 py-1 w-max mb-3 rounded tracking-wider">{a.subcategory || a.category}</span>
+                        <span className="bg-green-600 text-white text-[10px] font-bold uppercase px-3 py-1 w-max mb-3 rounded tracking-wider">{tCategory(a.subcategory || a.category)}</span>
                         <h2 className="text-white text-2xl md:text-3xl font-black leading-tight group-hover:text-green-400 transition-colors mb-2">{a.title}</h2>
                         <span className="text-white/50 text-xs">{formatDate(a.createdAt)}</span>
                       </div>
@@ -204,9 +206,9 @@ function NewsContent() {
         {(search || page > 1 || heroArticles.length === 0) && !loading && (
           <div className="mb-8">
             <h1 className="text-3xl font-black text-slate-900 mb-2 uppercase tracking-tight">
-              {search ? `Search: "${search}"` : category === "All" ? "Latest News" : category}
+              {search ? `${t("search_prefix")} "${search}"` : category === "All" ? t("latest_news") : tCategory(category)}
             </h1>
-            <p className="text-slate-500 text-sm">{total} articles found</p>
+            <p className="text-slate-500 text-sm">{total} {t("articles_found")}</p>
           </div>
         )}
 
@@ -219,11 +221,11 @@ function NewsContent() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search articles..."
+                placeholder={t("search_articles_placeholder")}
                 className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
               />
             </div>
-            <button type="submit" className="bg-green-500 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-green-600 transition-colors">Search</button>
+            <button type="submit" className="bg-green-500 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-green-600 transition-colors">{t("search")}</button>
           </form>
         </div>
 
@@ -240,7 +242,7 @@ function NewsContent() {
                     : "bg-white text-slate-500 border-slate-100 hover:border-green-400"
                 }`}
               >
-                {cat}
+                {tCategory(cat)}
               </button>
             ))}
           </div>
@@ -254,7 +256,7 @@ function NewsContent() {
                 <Loader2 size={32} className="animate-spin text-green-500" />
               </div>
             ) : gridArticles.length === 0 && heroArticles.length === 0 ? (
-              <div className="text-center py-20 text-slate-400">No articles found.</div>
+              <div className="text-center py-20 text-slate-400">{t("no_articles")}</div>
             ) : (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -271,7 +273,7 @@ function NewsContent() {
                       disabled={page === 1}
                       className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-bold disabled:opacity-30 hover:border-green-400 transition-colors"
                     >
-                      Previous
+                      {t("previous")}
                     </button>
                     <div className="flex gap-1">
                       {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
@@ -295,7 +297,7 @@ function NewsContent() {
                       disabled={page >= totalPages}
                       className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-bold disabled:opacity-30 hover:border-green-400 transition-colors"
                     >
-                      Next
+                      {t("next")}
                     </button>
                   </div>
                 )}
@@ -306,24 +308,31 @@ function NewsContent() {
           {/* Sidebar */}
           <aside className="hidden lg:block w-72 shrink-0 space-y-6">
             <div className="bg-white rounded-2xl border border-slate-100 p-5">
-              <h3 className="font-bold text-slate-800 mb-4">Trending Topics</h3>
+              <h3 className="font-bold text-slate-800 mb-4">{t("trending_topics")}</h3>
               <ul className="space-y-2">
-                {["Ethanol Blending", "FRP 2026-27", "Sugar Export", "Maharashtra Mills", "Cane Prices", "ISMA Report"].map((t) => (
+                {[
+                  { query: "Ethanol Blending", key: "trend_ethanol_blending" },
+                  { query: "FRP 2026-27", key: "trend_frp" },
+                  { query: "Sugar Export", key: "trend_sugar_export" },
+                  { query: "Maharashtra Mills", key: "trend_mh_mills" },
+                  { query: "Cane Prices", key: "trend_cane_prices" },
+                  { query: "ISMA Report", key: "trend_isma" },
+                ].map((trend) => (
                   <li
-                    key={t}
-                    onClick={() => { setSearch(t); setPage(1); }}
+                    key={trend.key}
+                    onClick={() => { setSearch(trend.query); setPage(1); }}
                     className="flex items-center gap-2 text-sm text-slate-600 hover:text-green-600 cursor-pointer transition-colors"
                   >
-                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />{t}
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />{t(trend.key)}
                   </li>
                 ))}
               </ul>
             </div>
             <div className="bg-green-50 border border-green-100 rounded-2xl p-5">
-              <h3 className="font-bold text-slate-800 mb-2">Newsletter</h3>
-              <p className="text-sm text-slate-500 mb-3">Daily sugar industry digest</p>
-              <input type="email" placeholder="Your email" className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-green-400" />
-              <button className="w-full bg-green-500 text-white text-sm font-semibold py-2 rounded-lg hover:bg-green-600 transition-colors">Subscribe</button>
+              <h3 className="font-bold text-slate-800 mb-2">{t("newsletter")}</h3>
+              <p className="text-sm text-slate-500 mb-3">{t("newsletter_desc")}</p>
+              <input type="email" placeholder={t("your_email")} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-green-400" />
+              <button className="w-full bg-green-500 text-white text-sm font-semibold py-2 rounded-lg hover:bg-green-600 transition-colors">{t("subscribe")}</button>
             </div>
           </aside>
         </div>

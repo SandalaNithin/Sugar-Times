@@ -248,7 +248,7 @@ export default function SubscriptionPage() {
       const loaded = await loadRazorpayScript();
       if (!loaded) throw new Error("Razorpay SDK failed to load. Check your connection.");
 
-      // 1. Create Razorpay order on backend (Supports guests)
+      // 1. Create Razorpay order on backend (public route — supports guests)
       const { data: orderData } = await paymentsAPI.createOrder({ amount, currency: "INR" });
 
       // 2. Open Razorpay Checkout

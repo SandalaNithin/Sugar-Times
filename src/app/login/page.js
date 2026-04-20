@@ -3,26 +3,39 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock, Mail, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, User as UserIcon, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
-  const [form, setForm] = useState({ email: "", password: "", remember: false });
+  const [mode, setMode] = useState("login"); // "login" | "register"
+  const [form, setForm] = useState({ name: "", email: "", password: "", remember: false });
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, register } = useAuth();
+
+  const isRegister = mode === "register";
+
+  const toggleMode = () => {
+    setMode((m) => (m === "login" ? "register" : "login"));
+    setError("");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
-      const user = await login(form.email, form.password);
+      const user = isRegister
+        ? await register(form.name, form.email, form.password)
+        : await login(form.email, form.password);
       router.push(user.role === "admin" ? "/admin/dashboard" : "/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed. Please try again.");
+      setError(
+        err.response?.data?.message ||
+          (isRegister ? "Registration failed. Please try again." : "Login failed. Please try again.")
+      );
     } finally {
       setLoading(false);
     }
@@ -64,7 +77,7 @@ export default function LoginPage() {
               />
             </Link>
             <p className="text-slate-500 mt-3 text-xs font-bold uppercase tracking-[0.2em]">
-              Sign in to continue
+              {isRegister ? "Create your account" : "Sign in to continue"}
             </p>
           </div>
 
@@ -75,6 +88,26 @@ export default function LoginPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Name (register only) */}
+            {isRegister && (
+              <div>
+                <label className="block text-xs font-black uppercase tracking-wider text-slate-600 mb-2">
+                  Full Name <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <UserIcon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    required
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="Your name"
+                    className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 transition-all bg-white"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Email / Member Number */}
             <div>
               <label className="block text-xs font-black uppercase tracking-wider text-slate-600 mb-2">
@@ -118,7 +151,8 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Remember + Forgot */}
+            {/* Remember + Forgot (login only) */}
+            {!isRegister && (
             <div className="flex items-center justify-between text-sm pt-1">
               <label className="flex items-center gap-2 text-slate-600 cursor-pointer select-none">
                 <input
@@ -133,6 +167,7 @@ export default function LoginPage() {
                 Forgot password?
               </a>
             </div>
+            )}
 
             {/* Continue */}
             <button
@@ -143,11 +178,11 @@ export default function LoginPage() {
               {loading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Signing in...
+                  {isRegister ? "Creating account..." : "Signing in..."}
                 </>
               ) : (
                 <>
-                  Continue
+                  {isRegister ? "Create Account" : "Continue"}
                   <ArrowRight size={16} />
                 </>
               )}
@@ -161,10 +196,20 @@ export default function LoginPage() {
             </Link>
             <div className="w-full h-px bg-slate-100" />
             <div className="text-xs text-slate-500">
-              No account?{" "}
-              <Link href="/register" className="text-emerald-600 font-bold hover:underline">Register</Link>
-              {" "}or{" "}
-              <Link href="/subscription" className="text-emerald-600 font-bold hover:underline">Subscribe</Link>
+              {isRegister ? "Already have an account?" : "No account?"}{" "}
+              <button
+                type="button"
+                onClick={toggleMode}
+                className="text-emerald-600 font-bold hover:underline"
+              >
+                {isRegister ? "Sign in" : "Register"}
+              </button>
+              {!isRegister && (
+                <>
+                  {" "}or{" "}
+                  <Link href="/subscription" className="text-emerald-600 font-bold hover:underline">Subscribe</Link>
+                </>
+              )}
             </div>
           </div>
         </div>

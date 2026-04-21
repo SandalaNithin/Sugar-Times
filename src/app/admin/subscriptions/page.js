@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import AdminLayout from "@/components/AdminLayout";
-import { adminAPI } from "@/lib/api";
+import { adminAPI, subscriptionsAPI } from "@/lib/api";
+import DataExportImport from "@/components/DataExportImport";
 import { unwrapList } from "@/lib/unwrapList";
 import { Edit, Trash2, RefreshCw, Loader2, AlertCircle, CheckCircle2, Clock, XCircle, Search, Filter, X } from "lucide-react";
 
@@ -141,6 +142,44 @@ export default function AdminSubscriptions() {
     }
   };
 
+  const handleImport = async (parsedData, updateProgress) => {
+    let successCount = 0;
+    for (let i = 0; i < parsedData.length; i++) {
+        const item = parsedData[i];
+        try {
+            await subscriptionsAPI.create({
+                subscriberName: item["Name"] || "",
+                email: item["Email"] || "",
+                mobile: item["Mobile"] || "",
+                plan: item["Plan"] || "1year",
+                subscriptionType: item["Type"]?.toLowerCase() || "digital",
+                status: item["Status"]?.toLowerCase() || "active",
+                startDate: item["Start Date"] || "",
+                endDate: item["End Date"] || "",
+            });
+            successCount++;
+        } catch (error) {
+            console.error("Failed to import subscription row:", i, error);
+        }
+        updateProgress(i + 1);
+    }
+    if (successCount > 0) fetchData();
+    if (successCount < parsedData.length) {
+        throw new Error(`Imported ${successCount}/${parsedData.length} successfully.`);
+    }
+  };
+
+  const exportMapping = (sub) => ({
+      "Name": sub.subscriberName || sub.userId?.name || "",
+      "Email": sub.email || sub.userId?.email || "",
+      "Mobile": sub.mobile || "",
+      "Plan": sub.plan || "",
+      "Type": sub.subscriptionType || "",
+      "Start Date": formatDateInput(sub.startDate) || "",
+      "End Date": formatDateInput(sub.endDate) || "",
+      "Status": sub.status || ""
+  });
+
   // Delete handlers
   const handleDelete = async () => {
     setDeleteLoading(true);
@@ -163,7 +202,14 @@ export default function AdminSubscriptions() {
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">Subscription Management</h1>
           <p className="text-slate-500 text-sm mt-1">Industrial standard filtering for active and offline database.</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
+          <DataExportImport
+            title="Subscriptions"
+            data={subscriptions}
+            exportMapping={exportMapping}
+            onImport={handleImport}
+            isLoading={loading}
+          />
           <button
             onClick={fetchData}
             className="flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm"

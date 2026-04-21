@@ -58,14 +58,12 @@ export default function Navbar() {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setToday(new Date().toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      }));
-    }, 0);
+    setToday(new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }));
 
     // Fetch dynamic categories from API
     const fetchCategories = async () => {
@@ -129,7 +127,6 @@ export default function Navbar() {
     fetchCategories();
     fetchTicker();
     fetchSubscriptionStatus();
-    return () => clearTimeout(timer);
   }, [user]);
 
   const handleLogout = () => {
@@ -189,7 +186,7 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] w-1/3">
           <div className="flex items-center gap-2">
             <Calendar size={14} className="text-green-600" />
-            <span className="border-b border-slate-200 pb-0.5">{today}</span>
+            <span translate="no" className="notranslate border-b border-slate-200 pb-0.5" suppressHydrationWarning>{today}</span>
           </div>
         </div>
 

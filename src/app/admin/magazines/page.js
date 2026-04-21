@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { magazinesAPI } from "@/lib/api";
 import { Plus, Edit, Trash2, Upload, Eye, X, Loader2, Save, FileText, Image as ImageIcon } from "lucide-react";
+import toast, { Toaster } from "react-hot-toast";
+import DataExportImport from "@/components/DataExportImport";
 
 export default function AdminMagazines() {
   const [magazines, setMagazines] = useState([]);
@@ -91,6 +93,39 @@ export default function AdminMagazines() {
     }
   };
 
+  const handleImport = async (parsedData, updateProgress) => {
+    let successCount = 0;
+    for (let i = 0; i < parsedData.length; i++) {
+        const item = parsedData[i];
+        try {
+            const formData = new FormData();
+            formData.append("title", item["Title"] || "Untitled");
+            formData.append("pages", item["Pages"] || 48);
+            formData.append("accessType", item["Access Type"]?.toLowerCase() || "free");
+            formData.append("fileUrl", item["PDF Link"] || "");
+            formData.append("coverImage", item["Cover Link"] || "");
+
+            await magazinesAPI.create(formData);
+            successCount++;
+        } catch (error) {
+            console.error("Failed to import magazine row:", i, error);
+        }
+        updateProgress(i + 1);
+    }
+    if (successCount > 0) fetchMagazines();
+    if (successCount < parsedData.length) {
+        throw new Error(`Imported ${successCount}/${parsedData.length} successfully.`);
+    }
+  };
+
+  const exportMapping = (mag) => ({
+      "Title": mag.title,
+      "Pages": mag.pages || 48,
+      "Access Type": mag.accessType === "premium" ? "Premium" : "Free",
+      "PDF Link": mag.fileUrl || "",
+      "Cover Link": mag.coverImage || mag.cover || ""
+  });
+
   const getImageUrl = (url) => {
     if (!url) return "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400";
     if (url.startsWith('http')) return url;
@@ -105,14 +140,24 @@ export default function AdminMagazines() {
 
   return (
     <AdminLayout>
+      <Toaster position="top-right" />
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-black text-slate-900">Magazines</h1>
           <p className="text-slate-500 text-sm mt-1">Upload and manage magazine issues ({magazines.length})</p>
         </div>
-        <button onClick={handleUploadClick} className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors">
-          <Upload size={16} /> Upload Issue
-        </button>
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
+          <DataExportImport
+            title="Magazines"
+            data={magazines}
+            exportMapping={exportMapping}
+            onImport={handleImport}
+            isLoading={loading}
+          />
+          <button onClick={handleUploadClick} className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors">
+            <Upload size={16} /> Upload Issue
+          </button>
+        </div>
       </div>
 
       {/* Upload area shortcut */}

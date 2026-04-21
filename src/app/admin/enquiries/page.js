@@ -6,6 +6,7 @@ import { adminAPI } from "@/lib/api";
 import { unwrapList } from "@/lib/unwrapList";
 import { useAuth } from "@/context/AuthContext";
 import { Loader2, Search, Trash2, ChevronDown, ChevronUp, Check, Filter, X } from "lucide-react";
+import DataExportImport from "@/components/DataExportImport";
 
 export default function AdminEnquiriesPage() {
   const [enquiries, setEnquiries] = useState([]);
@@ -111,6 +112,16 @@ export default function AdminEnquiriesPage() {
     }
   };
 
+  const exportMapping = (enq) => ({
+      "Full Name": enq.fullName || "",
+      "Email": enq.email || "",
+      "Subject": enq.subject || "General Support",
+      "Contact No": enq.contactNo || "",
+      "Message": enq.commentsOrMessage || "",
+      "Status": enq.status || "unread",
+      "Submitted On": enq.createdAt ? new Date(enq.createdAt).toISOString().split("T")[0] : ""
+  });
+
   if (authLoading) {
     return (
       <AdminLayout>
@@ -131,6 +142,12 @@ export default function AdminEnquiriesPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
+          <DataExportImport
+            title="Enquiries"
+            data={enquiries}
+            exportMapping={exportMapping}
+            isLoading={loading}
+          />
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input 

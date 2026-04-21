@@ -137,12 +137,12 @@ function img(url) {
 
 /* ── Section color palette ─────────────────────────────────────────────── */
 const PALETTES = [
-  { bg: "bg-green-500",   text: "text-green-600",  light: "bg-green-50",  border: "border-green-500",  pill: "bg-green-100 text-green-700", hover: "hover:text-green-600" },
-  { bg: "bg-amber-500",   text: "text-amber-600",  light: "bg-amber-50",  border: "border-amber-500",  pill: "bg-amber-100 text-amber-700", hover: "hover:text-amber-600" },
-  { bg: "bg-lime-600",    text: "text-lime-700",   light: "bg-lime-50",   border: "border-lime-600",   pill: "bg-lime-100 text-lime-700",   hover: "hover:text-lime-700" },
-  { bg: "bg-sky-500",     text: "text-sky-600",    light: "bg-sky-50",    border: "border-sky-500",    pill: "bg-sky-100 text-sky-700",     hover: "hover:text-sky-600" },
-  { bg: "bg-violet-500",  text: "text-violet-600", light: "bg-violet-50", border: "border-violet-500", pill: "bg-violet-100 text-violet-700", hover: "hover:text-violet-600" },
-  { bg: "bg-rose-500",    text: "text-rose-600",   light: "bg-rose-50",   border: "border-rose-500",   pill: "bg-rose-100 text-rose-700",   hover: "hover:text-rose-600" },
+  { bg: "bg-green-500", text: "text-green-600", light: "bg-green-50", border: "border-green-500", pill: "bg-green-100 text-green-700", hover: "hover:text-green-600" },
+  { bg: "bg-amber-500", text: "text-amber-600", light: "bg-amber-50", border: "border-amber-500", pill: "bg-amber-100 text-amber-700", hover: "hover:text-amber-600" },
+  { bg: "bg-lime-600", text: "text-lime-700", light: "bg-lime-50", border: "border-lime-600", pill: "bg-lime-100 text-lime-700", hover: "hover:text-lime-700" },
+  { bg: "bg-sky-500", text: "text-sky-600", light: "bg-sky-50", border: "border-sky-500", pill: "bg-sky-100 text-sky-700", hover: "hover:text-sky-600" },
+  { bg: "bg-violet-500", text: "text-violet-600", light: "bg-violet-50", border: "border-violet-500", pill: "bg-violet-100 text-violet-700", hover: "hover:text-violet-600" },
+  { bg: "bg-rose-500", text: "text-rose-600", light: "bg-rose-50", border: "border-rose-500", pill: "bg-rose-100 text-rose-700", hover: "hover:text-rose-600" },
 ];
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -226,6 +226,7 @@ export default async function HomePage() {
   const heroArticles = displayArticles.slice(0, 5);
   const latestArticles = displayArticles.slice(0, 8);
   const sidebarAd = activeAds.find((ad) => ad.placement === "sidebar" || ad.placement === "both");
+  const homeBannerAd = activeAds.find((ad) => ad.placement === "home_banner" || ad.placement === "both");
 
   if (heroArticles.length === 0 && sections.every((s) => s.allArticles.length === 0)) {
     return (
@@ -290,398 +291,411 @@ export default async function HomePage() {
       {/* ═══════════════════════════════════════════════════════════════════
           MAIN CONTENT — CATEGORY SECTIONS + SIDEBAR
           ═══════════════════════════════════════════════════════════════════ */}
-      <div className="max-w-[1440px] mx-auto px-4 py-8 sm:py-14 flex flex-col lg:flex-row gap-8 lg:gap-12">
+      <div className="max-w-[1440px] mx-auto px-4 py-8 sm:py-14">
 
-        {/* ── LEFT: All Parent Category Sections ───────────────────────── */}
-        <div className="flex-1 w-full space-y-14">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
 
-          {sections.map((section, idx) => {
-            const p = PALETTES[idx % PALETTES.length];
-            const hasArticles = section.allArticles.length > 0;
-            const heroItems = section.allArticles.slice(0, 5);
-            const listItems = section.allArticles.slice(5, 9);
-            const childrenWithArticles = section.childSections.filter((c) => c.articles.length > 0);
-            const categoryLink = `/news?category=${encodeURIComponent(section.name)}`;
+          {/* ── LEFT: All Parent Category Sections ───────────────────────── */}
+          <div className="flex-1 w-full space-y-14">
 
-            return (
-              <section key={section._id || section.slug}>
-                {/* ── Parent Category Header ──────────────────────────── */}
-                <div className={`mb-6 border-b-2 ${p.border}`}>
-                  <div className="flex items-center justify-between">
-                    <h2 className={`${p.bg} text-white font-bold text-[13px] uppercase tracking-wider px-4 py-2 inline-flex items-center gap-2 -mb-0.5`}>
-                      <span className="text-lg">{section.emoji}</span>
-                      {section.name}
-                    </h2>
-                    <Link href={categoryLink} className={`text-xs font-bold ${p.text} ${p.hover} uppercase tracking-wider mr-1 flex items-center gap-1`}>
-                      View All <ChevronRight size={12} />
-                    </Link>
-                  </div>
-                </div>
+            {sections.map((section, idx) => {
+              const p = PALETTES[idx % PALETTES.length];
+              const hasArticles = section.allArticles.length > 0;
+              const heroItems = section.allArticles.slice(0, 5);
+              const listItems = section.allArticles.slice(5, 9);
+              const childrenWithArticles = section.childSections.filter((c) => c.articles.length > 0);
+              const categoryLink = `/news?category=${encodeURIComponent(section.name)}`;
 
-                {/* ── Sub-category Pills ───────────────────────────────── */}
-                {(section.children || []).length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {(section.children || []).map((child) => (
-                      <Link
-                        key={child._id || child.slug}
-                        href={`/news?category=${encodeURIComponent(child.name)}`}
-                        className={`text-[11px] font-bold px-3 py-1.5 rounded-full ${p.pill} hover:opacity-80 transition-opacity`}
-                      >
-                        {child.name}
+              return (
+                <section key={section._id || section.slug}>
+                  {/* ── Parent Category Header ──────────────────────────── */}
+                  <div className={`mb-6 border-b-2 ${p.border}`}>
+                    <div className="flex items-center justify-between">
+                      <h2 className={`${p.bg} text-white font-bold text-[13px] uppercase tracking-wider px-4 py-2 inline-flex items-center gap-2 -mb-0.5`}>
+                        <span className="text-lg">{section.emoji}</span>
+                        {section.name}
+                      </h2>
+                      <Link href={categoryLink} className={`text-xs font-bold ${p.text} ${p.hover} uppercase tracking-wider mr-1 flex items-center gap-1`}>
+                        View All <ChevronRight size={12} />
                       </Link>
-                    ))}
+                    </div>
                   </div>
-                )}
 
-                {/* ── Category Hero — newest articles grid ─────────────── */}
-                {hasArticles ? (
-                  <>
-                    {heroItems.length >= 5 ? (
-                      /* Full hero: 2 left | 1 center large | 2 right */
-                      <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 h-auto lg:h-[400px] rounded-xl overflow-hidden">
-                        <div className="grid grid-rows-2 gap-3 lg:col-span-1 h-[400px] lg:h-full">
-                          {heroItems.slice(0, 2).map((a) => (
-                            <CategoryHeroCard key={a._id} article={a} palette={p} />
+                  {/* ── Sub-category Pills ───────────────────────────────── */}
+                  {(section.children || []).length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {(section.children || []).map((child) => (
+                        <Link
+                          key={child._id || child.slug}
+                          href={`/news?category=${encodeURIComponent(child.name)}`}
+                          className={`text-[11px] font-bold px-3 py-1.5 rounded-full ${p.pill} hover:opacity-80 transition-opacity`}
+                        >
+                          {child.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* ── Category Hero — newest articles grid ─────────────── */}
+                  {hasArticles ? (
+                    <>
+                      {heroItems.length >= 5 ? (
+                        /* Full hero: 2 left | 1 center large | 2 right */
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 h-auto lg:h-[400px] rounded-xl overflow-hidden">
+                          <div className="grid grid-rows-2 gap-3 lg:col-span-1 h-[400px] lg:h-full">
+                            {heroItems.slice(0, 2).map((a) => (
+                              <CategoryHeroCard key={a._id} article={a} palette={p} />
+                            ))}
+                          </div>
+                          <div className="lg:col-span-2 h-[400px] lg:h-full">
+                            <CategoryHeroLarge article={heroItems[2]} palette={p} />
+                          </div>
+                          <div className="grid grid-rows-2 gap-3 lg:col-span-1 h-[400px] lg:h-full">
+                            {heroItems.slice(3, 5).map((a) => (
+                              <CategoryHeroCard key={a._id} article={a} palette={p} />
+                            ))}
+                          </div>
+                        </div>
+                      ) : heroItems.length >= 3 ? (
+                        /* 3-4 articles */
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 h-auto lg:h-[350px] rounded-xl overflow-hidden">
+                          <div className="h-[250px] lg:h-full"><CategoryHeroCard article={heroItems[0]} palette={p} /></div>
+                          <div className="h-[250px] lg:h-full"><CategoryHeroLarge article={heroItems[1]} palette={p} /></div>
+                          <div className={`${heroItems.length === 4 ? "grid grid-rows-2 gap-3" : ""} h-[250px] lg:h-full`}>
+                            {heroItems.slice(2).map((a) => (<CategoryHeroCard key={a._id} article={a} palette={p} />))}
+                          </div>
+                        </div>
+                      ) : heroItems.length === 2 ? (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 h-auto lg:h-[320px] rounded-xl overflow-hidden">
+                          {heroItems.map((a) => (
+                            <div key={a._id} className="h-[250px] lg:h-full"><CategoryHeroLarge article={a} palette={p} /></div>
                           ))}
                         </div>
-                        <div className="lg:col-span-2 h-[400px] lg:h-full">
-                          <CategoryHeroLarge article={heroItems[2]} palette={p} />
+                      ) : (
+                        <div className="h-[320px] rounded-xl overflow-hidden">
+                          <CategoryHeroLarge article={heroItems[0]} palette={p} />
                         </div>
-                        <div className="grid grid-rows-2 gap-3 lg:col-span-1 h-[400px] lg:h-full">
-                          {heroItems.slice(3, 5).map((a) => (
-                            <CategoryHeroCard key={a._id} article={a} palette={p} />
-                          ))}
-                        </div>
-                      </div>
-                    ) : heroItems.length >= 3 ? (
-                      /* 3-4 articles */
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 h-auto lg:h-[350px] rounded-xl overflow-hidden">
-                        <div className="h-[250px] lg:h-full"><CategoryHeroCard article={heroItems[0]} palette={p} /></div>
-                        <div className="h-[250px] lg:h-full"><CategoryHeroLarge article={heroItems[1]} palette={p} /></div>
-                        <div className={`${heroItems.length === 4 ? "grid grid-rows-2 gap-3" : ""} h-[250px] lg:h-full`}>
-                          {heroItems.slice(2).map((a) => (<CategoryHeroCard key={a._id} article={a} palette={p} />))}
-                        </div>
-                      </div>
-                    ) : heroItems.length === 2 ? (
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 h-auto lg:h-[320px] rounded-xl overflow-hidden">
-                        {heroItems.map((a) => (
-                          <div key={a._id} className="h-[250px] lg:h-full"><CategoryHeroLarge article={a} palette={p} /></div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="h-[320px] rounded-xl overflow-hidden">
-                        <CategoryHeroLarge article={heroItems[0]} palette={p} />
-                      </div>
-                    )}
+                      )}
 
-                    {/* ── More articles list below hero ───────────────── */}
-                    {listItems.length > 0 && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-                        {listItems.map((a) => (
-                          <Link key={a._id} href={`/article/${a._id}`} className="group flex gap-4 items-start pb-4 border-b border-slate-100 last:border-0">
-                            <div className="w-[100px] h-[70px] shrink-0 bg-slate-100 overflow-hidden rounded-md">
-                              <img src={img(a.image)} alt={a.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <span className={`text-[10px] font-bold ${p.pill} px-2 py-0.5 rounded-full inline-block mb-1`}>{a.subcategory || a.category}</span>
-                              <h4 className="text-[13px] font-bold text-slate-800 leading-snug group-hover:text-green-600 transition-colors line-clamp-2">{a.title}</h4>
-                              <span className="text-[10px] text-slate-400 mt-1 block">{a.date}</span>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className={`${p.light} rounded-xl p-8 text-center border border-slate-100`}>
-                    <span className="text-3xl block mb-3">{section.emoji}</span>
-                    <p className="text-sm text-slate-500 font-medium">No articles in <strong>{section.name}</strong> yet.</p>
-                    <p className="text-xs text-slate-400 mt-1">Publish articles under this category to see them here.</p>
-                  </div>
-                )}
-
-                {/* ── Sub-category article grids ──────────────────────── */}
-                {childrenWithArticles.length > 0 && (
-                  <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {childrenWithArticles.slice(0, 3).map((child) => (
-                      <div key={child._id || child.slug}>
-                        <div className="flex items-center justify-between mb-3">
-                          <h3 className="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                            <span className={`w-1.5 h-1.5 rounded-full ${p.bg}`} />
-                            {child.name}
-                          </h3>
-                          <Link href={`/news?category=${encodeURIComponent(child.name)}`} className={`text-[10px] font-bold ${p.text} ${p.hover}`}>
-                            More <ArrowRight size={9} className="inline" />
-                          </Link>
-                        </div>
-                        <div className="space-y-3">
-                          {child.articles.slice(0, 3).map((a) => (
-                            <Link key={a._id} href={`/article/${a._id}`} className="group flex gap-3 items-center">
-                              <div className="w-14 h-14 shrink-0 bg-slate-100 overflow-hidden rounded-lg">
-                                <img src={img(a.image)} alt={a.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                      {/* ── More articles list below hero ───────────────── */}
+                      {listItems.length > 0 && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+                          {listItems.map((a) => (
+                            <Link key={a._id} href={`/article/${a._id}`} className="group flex gap-4 items-start pb-4 border-b border-slate-100 last:border-0">
+                              <div className="w-[100px] h-[70px] shrink-0 bg-slate-100 overflow-hidden rounded-md">
+                                <img src={img(a.image)} alt={a.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h4 className={`text-[12px] font-bold text-slate-700 leading-snug group-hover:${p.text} transition-colors line-clamp-2`}>{a.title}</h4>
-                                <span className="text-[10px] text-slate-400">{a.date}</span>
+                                <span className={`text-[10px] font-bold ${p.pill} px-2 py-0.5 rounded-full inline-block mb-1`}>{a.subcategory || a.category}</span>
+                                <h4 className="text-[13px] font-bold text-slate-800 leading-snug group-hover:text-green-600 transition-colors line-clamp-2">{a.title}</h4>
+                                <span className="text-[10px] text-slate-400 mt-1 block">{a.date}</span>
                               </div>
                             </Link>
                           ))}
                         </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className={`${p.light} rounded-xl p-8 text-center border border-slate-100`}>
+                      <span className="text-3xl block mb-3">{section.emoji}</span>
+                      <p className="text-sm text-slate-500 font-medium">No articles in <strong>{section.name}</strong> yet.</p>
+                      <p className="text-xs text-slate-400 mt-1">Publish articles under this category to see them here.</p>
+                    </div>
+                  )}
+
+                  {/* ── Sub-category article grids ──────────────────────── */}
+                  {childrenWithArticles.length > 0 && (
+                    <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {childrenWithArticles.slice(0, 3).map((child) => (
+                        <div key={child._id || child.slug}>
+                          <div className="flex items-center justify-between mb-3">
+                            <h3 className="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                              <span className={`w-1.5 h-1.5 rounded-full ${p.bg}`} />
+                              {child.name}
+                            </h3>
+                            <Link href={`/news?category=${encodeURIComponent(child.name)}`} className={`text-[10px] font-bold ${p.text} ${p.hover}`}>
+                              More <ArrowRight size={9} className="inline" />
+                            </Link>
+                          </div>
+                          <div className="space-y-3">
+                            {child.articles.slice(0, 3).map((a) => (
+                              <Link key={a._id} href={`/article/${a._id}`} className="group flex gap-3 items-center">
+                                <div className="w-14 h-14 shrink-0 bg-slate-100 overflow-hidden rounded-lg">
+                                  <img src={img(a.image)} alt={a.title} className="w-full h-auto object-cover group-hover:scale-110 transition-transform" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h4 className={`text-[12px] font-bold text-slate-700 leading-snug group-hover:${p.text} transition-colors line-clamp-2`}>{a.title}</h4>
+                                  <span className="text-[10px] text-slate-400">{a.date}</span>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Home Banner Ad — Injected after the Technology section (smaller size) */}
+                  {section.name === "Technology" && homeBannerAd && (
+                    <div className="my-14 text-center">
+                      <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black mb-2">Advertisement</p>
+                      <a href={homeBannerAd.link || "#"} target="_blank" rel="noopener noreferrer" className="block mx-auto overflow-hidden group max-w-5xl border border-slate-100 rounded-xl bg-white">
+                        <img
+                          src={img(homeBannerAd.image)}
+                          alt={homeBannerAd.title || "Advertisement"}
+                          className="w-full h-24 lg:h-32 object-contain group-hover:scale-[1.02] transition-transform duration-500"
+                        />
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Divider (only if ad wasn't just shown) */}
+                  {idx < sections.length - 1 && section.name !== "Technology" && <div className="border-b border-slate-100 mt-10" />}
+                </section>
+              );
+            })}
+
+            {/* ── Highlights Hub (dark section) ─────────────────────────── */}
+            {sections.filter((s) => s.allArticles.length > 0).length > 0 && (
+              <section>
+                <div className="bg-slate-900 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl -mr-20 -mt-20" />
+                  <h2 className="text-white text-2xl font-black uppercase tracking-widest mb-8 flex items-center gap-3">
+                    <span className="w-2 h-8 bg-green-500 rounded-full" />
+                    Highlights
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {sections.filter((s) => s.allArticles.length > 0).slice(0, 6).map((s) => (
+                      <div key={`hl-${s._id}`} className="space-y-3">
+                        <Link href={`/news?category=${encodeURIComponent(s.name)}`} className="text-green-400 font-bold text-xs uppercase tracking-widest hover:underline flex items-center gap-2">
+                          {s.emoji} {s.name} <ArrowRight size={11} />
+                        </Link>
+                        {s.allArticles.slice(0, 2).map((a) => (
+                          <Link key={a._id} href={`/article/${a._id}`} className="group block">
+                            <h4 className="text-white text-[13px] font-bold group-hover:text-green-400 transition-colors line-clamp-2">{a.title}</h4>
+                            <p className="text-white/40 text-[10px] mt-1">{a.date}</p>
+                          </Link>
+                        ))}
                       </div>
                     ))}
                   </div>
-                )}
-
-                {/* Divider */}
-                {idx < sections.length - 1 && <div className="border-b border-slate-100 mt-10" />}
-              </section>
-            );
-          })}
-
-          {/* ── Highlights Hub (dark section) ─────────────────────────── */}
-          {sections.filter((s) => s.allArticles.length > 0).length > 0 && (
-            <section>
-              <div className="bg-slate-900 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl -mr-20 -mt-20" />
-                <h2 className="text-white text-2xl font-black uppercase tracking-widest mb-8 flex items-center gap-3">
-                  <span className="w-2 h-8 bg-green-500 rounded-full" />
-                  Highlights
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {sections.filter((s) => s.allArticles.length > 0).slice(0, 6).map((s) => (
-                    <div key={`hl-${s._id}`} className="space-y-3">
-                      <Link href={`/news?category=${encodeURIComponent(s.name)}`} className="text-green-400 font-bold text-xs uppercase tracking-widest hover:underline flex items-center gap-2">
-                        {s.emoji} {s.name} <ArrowRight size={11} />
-                      </Link>
-                      {s.allArticles.slice(0, 2).map((a) => (
-                        <Link key={a._id} href={`/article/${a._id}`} className="group block">
-                          <h4 className="text-white text-[13px] font-bold group-hover:text-green-400 transition-colors line-clamp-2">{a.title}</h4>
-                          <p className="text-white/40 text-[10px] mt-1">{a.date}</p>
-                        </Link>
-                      ))}
-                    </div>
-                  ))}
                 </div>
-              </div>
-            </section>
-          )}
-        </div>
-
-        {/* ── RIGHT SIDEBAR ────────────────────────────────────────────── */}
-        <aside className="w-full lg:w-[320px] shrink-0 space-y-8">
-
-          {/* My account */}
-          <div className="hidden lg:flex justify-end">
-            <Link href="/login" className="flex items-center gap-2 text-sm text-slate-600 font-semibold hover:text-green-500 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              My account
-            </Link>
+              </section>
+            )}
           </div>
 
-          {/* Magazines — Latest to oldest */}
-          {magazines.length > 0 && (
-            <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-              <div className="bg-[#b5cc95] p-6 text-center relative overflow-hidden">
-                <div className="absolute top-2 left-2 text-[#4d6a26] font-black text-2xl uppercase opacity-15 transform -rotate-12 pointer-events-none">Sugar<br/>Times</div>
-                <Link href="/magazines" className="block relative z-10">
-                  <div className="w-40 mx-auto shadow-2xl border-4 border-white rounded-sm overflow-hidden">
-                    <img src={img(magazines[0].cover)} alt={magazines[0].title} className="w-full h-auto object-cover" />
+          {/* ── RIGHT SIDEBAR ────────────────────────────────────────────── */}
+          <aside className="w-full lg:w-[320px] shrink-0 space-y-8">
+
+            {/* My account */}
+            <div className="hidden lg:flex justify-end">
+              <Link href="/login" className="flex items-center gap-2 text-sm text-slate-600 font-semibold hover:text-green-500 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                My account
+              </Link>
+            </div>
+
+            {/* Magazines — Latest to oldest */}
+            {magazines.length > 0 && (
+              <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                <div className="bg-[#b5cc95] p-6 text-center relative overflow-hidden">
+                  <div className="absolute top-2 left-2 text-[#4d6a26] font-black text-2xl uppercase opacity-15 transform -rotate-12 pointer-events-none">Sugar<br />Times</div>
+                  <Link href="/magazines" className="block relative z-10">
+                    <div className="w-40 mx-auto shadow-2xl border-4 border-white rounded-sm overflow-hidden">
+                      <img src={img(magazines[0].cover)} alt={magazines[0].title} className="w-full h-auto object-cover" />
+                    </div>
+                  </Link>
+                  <h3 className="font-bold text-slate-800 text-lg mt-4 relative z-10">Latest Issue</h3>
+                  <p className="text-slate-600 text-xs mt-1 relative z-10">{magazines[0].title}</p>
+                </div>
+                {magazines.length > 1 && (
+                  <div className="p-4 space-y-3">
+                    {magazines.slice(1, 4).map((m) => (
+                      <Link key={m._id} href="/magazines" className="group flex gap-3 items-center">
+                        <div className="w-12 h-16 shrink-0 bg-slate-100 border border-slate-200 rounded overflow-hidden">
+                          <img src={img(m.cover)} alt={m.title} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[12px] font-bold text-slate-700 line-clamp-2 group-hover:text-green-600 transition-colors">{m.title}</h4>
+                          <span className="text-[10px] text-slate-400">{m.pages} pages {m.premium ? "• Premium" : "• Free"}</span>
+                        </div>
+                      </Link>
+                    ))}
                   </div>
+                )}
+                <Link href="/magazines" className="block text-center py-3 text-xs font-bold text-green-600 hover:bg-green-50 border-t border-slate-100 transition-colors">
+                  View All Magazines <ChevronRight size={12} className="inline" />
                 </Link>
-                <h3 className="font-bold text-slate-800 text-lg mt-4 relative z-10">Latest Issue</h3>
-                <p className="text-slate-600 text-xs mt-1 relative z-10">{magazines[0].title}</p>
               </div>
-              {magazines.length > 1 && (
-                <div className="p-4 space-y-3">
-                  {magazines.slice(1, 4).map((m) => (
-                    <Link key={m._id} href="/magazines" className="group flex gap-3 items-center">
-                      <div className="w-12 h-16 shrink-0 bg-slate-100 border border-slate-200 rounded overflow-hidden">
-                        <img src={img(m.cover)} alt={m.title} className="w-full h-full object-cover" />
+            )}
+
+            {/* Stay Connected */}
+            <div className="bg-white">
+              <div className="mb-5 border-b-2 border-slate-900">
+                <h2 className="bg-slate-900 text-white font-semibold text-[13px] uppercase tracking-wider px-3 py-1.5 inline-block -mb-0.5">Stay Connected</h2>
+              </div>
+              <div className="space-y-2">
+                {[
+                  { href: "https://www.facebook.com/TheSugarTimes/", bg: "bg-[#3b5998]", label: "Facebook", action: "LIKE", icon: "M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" },
+                  { href: "https://x.com/SugarTimes", bg: "bg-[#1DA1F2]", label: "Twitter / X", action: "FOLLOW", icon: "M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" },
+                  { href: "https://www.youtube.com/@sugartimesmagazine2346", bg: "bg-[#CD201F]", label: "YouTube", action: "SUBSCRIBE", icon: "M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" },
+                  { href: "https://in.linkedin.com/company/sugar-times-magazine", bg: "bg-[#0A66C2]", label: "LinkedIn", action: "CONNECT", icon: "M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z" },
+                  { href: "https://www.instagram.com/sugartimesmagazine/", bg: "bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#dc2743]", label: "Instagram", action: "FOLLOW", icon: "M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" },
+                ].map((s) => (
+                  <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between border border-slate-100 p-3 hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 flex items-center justify-center ${s.bg} text-white rounded`}><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={s.icon} /></svg></div>
+                      <span className="text-[13px] font-bold text-slate-800">{s.label}</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-800">{s.action}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Category quick-nav sidebar */}
+            <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+              <div className="bg-slate-900 text-white px-4 py-3">
+                <h3 className="font-black text-[12px] uppercase tracking-wider">Browse Categories</h3>
+              </div>
+              <div className="p-4 space-y-1">
+                {sections.map((s, i) => {
+                  const p = PALETTES[i % PALETTES.length];
+                  return (
+                    <Link key={s._id} href={`/news?category=${encodeURIComponent(s.name)}`} className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-slate-50 transition-colors group">
+                      <span className="flex items-center gap-2.5 text-sm font-semibold text-slate-700 group-hover:text-slate-900">
+                        <span className="text-base">{s.emoji}</span>
+                        {s.name}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-bold ${p.pill} px-2 py-0.5 rounded-full`}>{s.allArticles.length}</span>
+                        <ChevronRight size={12} className="text-slate-300 group-hover:text-slate-500" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-[12px] font-bold text-slate-700 line-clamp-2 group-hover:text-green-600 transition-colors">{m.title}</h4>
-                        <span className="text-[10px] text-slate-400">{m.pages} pages {m.premium ? "• Premium" : "• Free"}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Latest Articles */}
+            {latestArticles.length > 0 && (
+              <div className="bg-white p-5 border border-slate-200 shadow-sm rounded-xl">
+                <h3 className="bg-slate-900 text-white font-black text-[12px] uppercase tracking-wider px-3 py-2 inline-block mb-4 rounded">Latest Articles</h3>
+                <div className="space-y-4">
+                  {latestArticles.map((a) => (
+                    <Link key={a._id} href={`/article/${a._id}`} className="group flex gap-3 items-start border-b border-slate-50 pb-3 last:border-0 last:pb-0">
+                      <div className="w-16 h-12 shrink-0 bg-slate-100 overflow-hidden rounded">
+                        <img src={img(a.image)} alt={a.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                      </div>
+                      <div>
+                        <h4 className="text-[12px] font-bold text-slate-800 leading-tight group-hover:text-green-600 transition-colors line-clamp-2">{a.title}</h4>
+                        <span className="text-[10px] text-slate-400 mt-0.5 block">{a.date}</span>
                       </div>
                     </Link>
                   ))}
                 </div>
-              )}
-              <Link href="/magazines" className="block text-center py-3 text-xs font-bold text-green-600 hover:bg-green-50 border-t border-slate-100 transition-colors">
-                View All Magazines <ChevronRight size={12} className="inline" />
-              </Link>
-            </div>
-          )}
-
-          {/* Stay Connected */}
-          <div className="bg-white">
-            <div className="mb-5 border-b-2 border-slate-900">
-              <h2 className="bg-slate-900 text-white font-semibold text-[13px] uppercase tracking-wider px-3 py-1.5 inline-block -mb-0.5">Stay Connected</h2>
-            </div>
-            <div className="space-y-2">
-              {[
-                { href: "https://www.facebook.com/TheSugarTimes/", bg: "bg-[#3b5998]", label: "Facebook", action: "LIKE", icon: "M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" },
-                { href: "https://x.com/SugarTimes", bg: "bg-[#1DA1F2]", label: "Twitter / X", action: "FOLLOW", icon: "M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" },
-                { href: "https://www.youtube.com/@sugartimesmagazine2346", bg: "bg-[#CD201F]", label: "YouTube", action: "SUBSCRIBE", icon: "M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" },
-                { href: "https://in.linkedin.com/company/sugar-times-magazine", bg: "bg-[#0A66C2]", label: "LinkedIn", action: "CONNECT", icon: "M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z" },
-                { href: "https://www.instagram.com/sugartimesmagazine/", bg: "bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#dc2743]", label: "Instagram", action: "FOLLOW", icon: "M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" },
-              ].map((s) => (
-                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between border border-slate-100 p-3 hover:bg-slate-50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 flex items-center justify-center ${s.bg} text-white rounded`}><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d={s.icon}/></svg></div>
-                    <span className="text-[13px] font-bold text-slate-800">{s.label}</span>
-                  </div>
-                  <span className="text-[10px] font-bold text-slate-800">{s.action}</span>
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Category quick-nav sidebar */}
-          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-            <div className="bg-slate-900 text-white px-4 py-3">
-              <h3 className="font-black text-[12px] uppercase tracking-wider">Browse Categories</h3>
-            </div>
-            <div className="p-4 space-y-1">
-              {sections.map((s, i) => {
-                const p = PALETTES[i % PALETTES.length];
-                return (
-                  <Link key={s._id} href={`/news?category=${encodeURIComponent(s.name)}`} className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-slate-50 transition-colors group">
-                    <span className="flex items-center gap-2.5 text-sm font-semibold text-slate-700 group-hover:text-slate-900">
-                      <span className="text-base">{s.emoji}</span>
-                      {s.name}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className={`text-[10px] font-bold ${p.pill} px-2 py-0.5 rounded-full`}>{s.allArticles.length}</span>
-                      <ChevronRight size={12} className="text-slate-300 group-hover:text-slate-500" />
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Latest Articles */}
-          {latestArticles.length > 0 && (
-            <div className="bg-white p-5 border border-slate-200 shadow-sm rounded-xl">
-              <h3 className="bg-slate-900 text-white font-black text-[12px] uppercase tracking-wider px-3 py-2 inline-block mb-4 rounded">Latest Articles</h3>
-              <div className="space-y-4">
-                {latestArticles.map((a) => (
-                  <Link key={a._id} href={`/article/${a._id}`} className="group flex gap-3 items-start border-b border-slate-50 pb-3 last:border-0 last:pb-0">
-                    <div className="w-16 h-12 shrink-0 bg-slate-100 overflow-hidden rounded">
-                      <img src={img(a.image)} alt={a.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                    </div>
-                    <div>
-                      <h4 className="text-[12px] font-bold text-slate-800 leading-tight group-hover:text-green-600 transition-colors line-clamp-2">{a.title}</h4>
-                      <span className="text-[10px] text-slate-400 mt-0.5 block">{a.date}</span>
-                    </div>
-                  </Link>
-                ))}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Advertisement */}
-          {sidebarAd ? (
-            <a href={sidebarAd.link || "#"} target="_blank" rel="noopener noreferrer" className="block bg-slate-100 border border-slate-200 rounded-xl relative group overflow-hidden">
-              <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest absolute top-2 right-2 border border-slate-200 bg-white px-2 py-0.5 rounded-sm z-10">Ad</span>
-              <img src={img(sidebarAd.image)} alt={sidebarAd.title} className="w-full h-auto object-cover" />
-            </a>
-          ) : (
-            <div className="bg-slate-100 border border-slate-200 h-[250px] flex items-center justify-center relative rounded-xl">
-              <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest absolute top-2 right-2 border border-slate-200 bg-white px-2 py-0.5 rounded-sm">Ad</span>
-              <div className="text-slate-300 text-center">
-                <span className="block text-3xl mb-1 font-black">300x250</span>
-                <span className="block text-xs uppercase tracking-widest font-bold">Ad Space</span>
+            {/* Advertisement */}
+            {sidebarAd ? (
+              <a href={sidebarAd.link || "#"} target="_blank" rel="noopener noreferrer" className="block bg-slate-100 border border-slate-200 rounded-xl relative group overflow-hidden">
+                <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest absolute top-2 right-2 border border-slate-200 bg-white px-2 py-0.5 rounded-sm z-10">Ad</span>
+                <img src={img(sidebarAd.image)} alt={sidebarAd.title} className="w-full h-auto object-cover" />
+              </a>
+            ) : (
+              <div className="bg-slate-100 border border-slate-200 h-[250px] flex items-center justify-center relative rounded-xl">
+                <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest absolute top-2 right-2 border border-slate-200 bg-white px-2 py-0.5 rounded-sm">Ad</span>
+                <div className="text-slate-300 text-center">
+                  <span className="block text-3xl mb-1 font-black">300x250</span>
+                  <span className="block text-xs uppercase tracking-widest font-bold">Ad Space</span>
+                </div>
               </div>
-            </div>
-          )}
-        </aside>
-      </div>
+            )}
+          </aside>
+        </div>
 
-      {/* ═══════════════════════════════════════════════════════════════════
+        {/* ═══════════════════════════════════════════════════════════════════
           FULL-WIDTH SECTIONS — Markets, Magazines, Pricing
           ═══════════════════════════════════════════════════════════════════ */}
-      <div className="max-w-[1440px] mx-auto px-4 mt-16">
+        <div className="max-w-[1440px] mx-auto px-4 mt-16">
 
-        {/* Market Insights */}
-        {markets.length > 0 && (
-          <section className="py-12 border-t border-slate-200">
-            <div className="flex items-center justify-between mb-6">
-              <div><h2 className="text-2xl font-black text-slate-900">Market Insights</h2><p className="text-slate-500 text-sm mt-1">Live sugarcane prices across states</p></div>
-              <Link href="/markets" className="flex items-center gap-1 text-green-600 font-semibold text-sm">Full Markets <ChevronRight size={16} /></Link>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-slate-50 border-b border-slate-100">
-                      <tr>
-                        <th className="text-left px-4 py-3 font-semibold text-slate-600">State</th>
-                        <th className="text-left px-4 py-3 font-semibold text-slate-600">Commodity</th>
-                        <th className="text-right px-4 py-3 font-semibold text-slate-600">Price</th>
-                        <th className="text-right px-4 py-3 font-semibold text-slate-600">Change</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {markets.slice(0, 8).map((row, i) => (
-                        <tr key={i} className="border-b border-slate-50 hover:bg-green-50/50 transition-colors">
-                          <td className="px-4 py-3 font-medium text-slate-800">{row.state}</td>
-                          <td className="px-4 py-3 text-slate-500">{row.commodity || row.variety || "Sugarcane"}</td>
-                          <td className="px-4 py-3 text-right font-bold text-slate-900">Rs {(row.price || 0).toLocaleString()}</td>
-                          <td className="px-4 py-3 text-right">
-                            <span className={`flex items-center justify-end gap-1 font-semibold ${(row.change||0)>0?"text-green-600":(row.change||0)<0?"text-red-500":"text-slate-400"}`}>
-                              {(row.change||0)>0?<TrendingUp size={13}/>:(row.change||0)<0?<TrendingDown size={13}/>:<Minus size={13}/>}
-                              {(row.change||0)>0?"+":""}{row.change||0}
-                            </span>
-                          </td>
+          {/* Market Insights */}
+          {markets.length > 0 && (
+            <section className="py-12 border-t border-slate-200">
+              <div className="flex items-center justify-between mb-6">
+                <div><h2 className="text-2xl font-black text-slate-900">Market Insights</h2><p className="text-slate-500 text-sm mt-1">Live sugarcane prices across states</p></div>
+                <Link href="/markets" className="flex items-center gap-1 text-green-600 font-semibold text-sm">Full Markets <ChevronRight size={16} /></Link>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-slate-50 border-b border-slate-100">
+                        <tr>
+                          <th className="text-left px-4 py-3 font-semibold text-slate-600">State</th>
+                          <th className="text-left px-4 py-3 font-semibold text-slate-600">Commodity</th>
+                          <th className="text-right px-4 py-3 font-semibold text-slate-600">Price</th>
+                          <th className="text-left px-4 py-3 font-semibold text-slate-600">Description</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {markets.slice(0, 8).map((row, i) => (
+                          <tr key={i} className="border-b border-slate-50 hover:bg-green-50/50 transition-colors">
+                            <td className="px-4 py-3 font-medium text-slate-800">{row.state}</td>
+                            <td className="px-4 py-3 text-slate-500">{row.commodity || "Sugarcane"}</td>
+                            <td className="px-4 py-3 text-right font-bold text-slate-900">Rs {(row.price || 0).toLocaleString()}</td>
+                            <td className="px-4 py-3 text-slate-500 text-xs max-w-[240px]">
+                              <span className="line-clamp-2">{row.description || "—"}</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                  <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2"><BarChart2 size={16} className="text-green-500" /> Price Overview</h3>
+                  <div className="space-y-3">
+                    {markets.slice(0, 6).map((m, i) => {
+                      const max = Math.max(...markets.map(x => x.price || 0));
+                      const pct = max > 0 ? Math.round(((m.price || 0) / max) * 100) : 0;
+                      return (
+                        <div key={i} className="flex items-center gap-3">
+                          <span className="text-xs text-slate-500 w-20 truncate">{m.state}</span>
+                          <div className="flex-1 bg-slate-100 rounded-full h-2"><div className="bg-green-500 h-2 rounded-full" style={{ width: `${pct}%` }} /></div>
+                          <span className="text-xs font-semibold text-slate-700 w-16 text-right">Rs {(m.price || 0).toLocaleString()}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <Link href="/markets" className="mt-5 block text-center text-sm text-green-600 font-semibold hover:underline">View Full Charts</Link>
                 </div>
               </div>
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-                <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2"><BarChart2 size={16} className="text-green-500" /> Price Overview</h3>
-                <div className="space-y-3">
-                  {markets.slice(0,6).map((m,i) => {
-                    const max = Math.max(...markets.map(x=>x.price||0));
-                    const pct = max>0?Math.round(((m.price||0)/max)*100):0;
-                    return (
-                      <div key={i} className="flex items-center gap-3">
-                        <span className="text-xs text-slate-500 w-20 truncate">{m.state}</span>
-                        <div className="flex-1 bg-slate-100 rounded-full h-2"><div className="bg-green-500 h-2 rounded-full" style={{width:`${pct}%`}}/></div>
-                        <span className="text-xs font-semibold text-slate-700 w-16 text-right">Rs {(m.price||0).toLocaleString()}</span>
-                      </div>
-                    );
-                  })}
+            </section>
+          )}
+
+          <PricingCards />
+
+          {/* Why Sugartimes */}
+          <section className="py-12 border-t border-slate-200">
+            <div className="text-center mb-10"><h2 className="text-3xl font-black text-slate-900 mb-3">Why Sugartimes?</h2></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {[
+                { icon: "📰", title: "Industry News", desc: "Daily updates from mills, markets, and government" },
+                { icon: "📊", title: "Market Data", desc: "Real-time sugarcane prices across all major states" },
+                { icon: "📋", title: "Policy Tracker", desc: "FRP, SAP, export policy all in one place" },
+                { icon: "📚", title: "Digital Magazines", desc: "Monthly editions with deep industry analysis" },
+              ].map((b, i) => (
+                <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 text-center hover:shadow-md transition-all group">
+                  <div className="text-3xl mb-3 group-hover:-translate-y-1 transition-transform">{b.icon}</div>
+                  <h3 className="font-bold text-slate-800 mb-2">{b.title}</h3>
+                  <p className="text-[13px] text-slate-500">{b.desc}</p>
                 </div>
-                <Link href="/markets" className="mt-5 block text-center text-sm text-green-600 font-semibold hover:underline">View Full Charts</Link>
-              </div>
+              ))}
             </div>
           </section>
-        )}
-
-
-        <PricingCards />
-
-        {/* Why Sugartimes */}
-        <section className="py-12 border-t border-slate-200">
-          <div className="text-center mb-10"><h2 className="text-3xl font-black text-slate-900 mb-3">Why Sugartimes?</h2></div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {[
-              { icon: "📰", title: "Industry News", desc: "Daily updates from mills, markets, and government" },
-              { icon: "📊", title: "Market Data", desc: "Real-time sugarcane prices across all major states" },
-              { icon: "📋", title: "Policy Tracker", desc: "FRP, SAP, export policy all in one place" },
-              { icon: "📚", title: "Digital Magazines", desc: "Monthly editions with deep industry analysis" },
-            ].map((b,i) => (
-              <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 text-center hover:shadow-md transition-all group">
-                <div className="text-3xl mb-3 group-hover:-translate-y-1 transition-transform">{b.icon}</div>
-                <h3 className="font-bold text-slate-800 mb-2">{b.title}</h3>
-                <p className="text-[13px] text-slate-500">{b.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        </div>
       </div>
     </div>
   );

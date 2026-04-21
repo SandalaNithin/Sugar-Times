@@ -8,6 +8,7 @@ import {
   GripVertical, Save, X, Loader2,
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
+import DataExportImport from "@/components/DataExportImport";
 
 const COLORS = [
   "from-emerald-500 to-teal-600",
@@ -141,6 +142,46 @@ export default function AdminCategoriesPage() {
     setExpandedParents((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const handleImport = async (parsedData, updateProgress) => {
+    let successCount = 0;
+    for (let i = 0; i < parsedData.length; i++) {
+        const item = parsedData[i];
+        try {
+            const parentName = item["Parent Name"]?.trim();
+            let parentId = null;
+            if (parentName) {
+                const parentCat = categories.find(c => c.name === parentName);
+                if (parentCat) parentId = parentCat._id;
+            }
+            await categoriesAPI.create({
+                name: item["Name"] || "Untitled",
+                slug: item["Slug"] || slugify(item["Name"] || "Untitled"),
+                emoji: item["Emoji"] || "",
+                color: item["Color"] || COLORS[0],
+                parent: parentId,
+                order: parseInt(item["Order"]) || 0
+            });
+            successCount++;
+        } catch (error) {
+            console.error("Failed to import category row:", i, error);
+        }
+        updateProgress(i + 1);
+    }
+    if (successCount > 0) fetchCategories();
+    if (successCount < parsedData.length) {
+        throw new Error(`Imported ${successCount}/${parsedData.length} successfully.`);
+    }
+  };
+
+  const exportMapping = (cat) => ({
+      "Name": cat.name,
+      "Slug": cat.slug,
+      "Emoji": cat.emoji || "",
+      "Color": cat.color || "",
+      "Parent Name": cat.parent?.name || (categories.find(c => c._id === cat.parent)?.name) || "",
+      "Order": cat.order || 0,
+  });
+
   return (
     <ProtectedRoute adminOnly>
       <AdminLayout>
@@ -157,6 +198,14 @@ export default function AdminCategoriesPage() {
                 Add, edit, or remove parent and sub-categories. These power the Navbar, Home page sections, and article filters.
               </p>
             </div>
+          <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
+            <DataExportImport
+              title="Categories"
+              data={categories}
+              exportMapping={exportMapping}
+              onImport={handleImport}
+              isLoading={loading}
+            />
             <button
               onClick={() => openCreateForm()}
               className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-5 py-3 rounded-xl shadow-lg shadow-emerald-500/20 transition-all"
@@ -164,6 +213,7 @@ export default function AdminCategoriesPage() {
               <Plus size={18} /> Add Parent Category
             </button>
           </div>
+        </div>
 
           {/* Form Modal */}
           {showForm && (

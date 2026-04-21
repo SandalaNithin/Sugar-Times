@@ -4,6 +4,7 @@ import AdminLayout from "@/components/AdminLayout";
 import { adminAPI } from "@/lib/api";
 import { unwrapList } from "@/lib/unwrapList";
 import { Search, Plus, Edit, Trash2, Loader2, RefreshCw, AlertCircle, X, CheckCircle2 } from "lucide-react";
+import DataExportImport from "@/components/DataExportImport";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -180,6 +181,35 @@ export default function AdminUsers() {
     }
   };
 
+  const handleImport = async (parsedData, updateProgress) => {
+    let successCount = 0;
+    for (let i = 0; i < parsedData.length; i++) {
+        const item = parsedData[i];
+        try {
+            await adminAPI.createUser({
+                name: item["Name"] || "Unknown User",
+                email: item["Email"] || "",
+                role: item["Role"]?.toLowerCase() === "admin" ? "admin" : "user",
+            });
+            successCount++;
+        } catch (error) {
+            console.error("Failed to import user row:", i, error);
+        }
+        updateProgress(i + 1);
+    }
+    if (successCount > 0) fetchUsers();
+    if (successCount < parsedData.length) {
+        throw new Error(`Imported ${successCount}/${parsedData.length} successfully.`);
+    }
+  };
+
+  const exportMapping = (u) => ({
+      "Name": u.name || "",
+      "Email": u.email || "",
+      "Role": u.role === "admin" ? "Admin" : "User",
+      "Joined On": u.createdAt ? new Date(u.createdAt).toISOString().split("T")[0] : ""
+  });
+
   return (
     <AdminLayout>
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
@@ -187,7 +217,14 @@ export default function AdminUsers() {
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">User Management</h1>
           <p className="text-slate-500 text-sm mt-1">Industrial standard user administration and control</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
+          <DataExportImport
+            title="Users"
+            data={users}
+            exportMapping={exportMapping}
+            onImport={handleImport}
+            isLoading={loading}
+          />
           <button 
             onClick={fetchUsers}
             className="flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm"

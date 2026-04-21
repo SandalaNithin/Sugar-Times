@@ -47,6 +47,7 @@ export const CATEGORY_TREE = [
     color: "from-sky-500 to-blue-600",
     children: [
       { slug: "market-trends", label: "Market Trends" },
+      { slug: "market-rates", label: "Market Rates" },
       { slug: "international-trade", label: "International Trade" },
       { slug: "export-import", label: "Export / Import" },
     ],

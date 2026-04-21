@@ -1,6 +1,7 @@
 import NewsCard from "@/components/NewsCard";
 import Link from "next/link";
 import { Lock, ChevronRight, ChevronLeft, ArrowRight } from "lucide-react";
+import { FacebookIcon, InstagramIcon, LinkedInIcon, MailIcon, TwitterXIcon, WhatsAppIcon, YouTubeIcon } from "@/components/SocialIcons";
 import { notFound } from "next/navigation";
 import { mockArticles } from "@/lib/mockData";
 import ArticleShareBar from "@/components/article/ArticleShareBar";
@@ -240,19 +241,48 @@ export default async function ArticlePage({ params }) {
               </div>
             )}
 
-            {/* Author Card */}
-            <div className="mt-12 flex items-start gap-5 p-8 rounded-2xl bg-slate-50 border border-slate-100">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-black text-2xl shrink-0 shadow-lg shadow-emerald-500/20">
-                {(article.author || "S")[0].toUpperCase()}
-              </div>
-              <div>
-                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1.5">Authorized Contributor</div>
-                <h4 className="text-xl font-black text-slate-900 mb-2">{article.author || "Sugar Times Team"}</h4>
-                <p className="text-sm text-slate-600 leading-relaxed max-w-lg">
-                  Covering India&apos;s sugar &amp; bio-energy industry — market news, policy updates, and agricultural intelligence for the industry.
-                </p>
-              </div>
-            </div>
+            {/* Author Card — rendered only when the admin has enabled it for
+                this article. Name and bio come from the admin form; legacy
+                articles without the fields fall back to the house defaults.
+                Name is a link to /author/<slug> profile page. */}
+            {article.showContributor !== false && (() => {
+              const contributorName = article.contributorName?.trim() || article.author || "Sugar Times Team";
+              const contributorBio = article.contributorBio?.trim() || "Covering India's sugar & bio-energy industry — market news, policy updates, and agricultural intelligence for the industry.";
+              const authorSlug = contributorName.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+              const authorHref = `/author/${authorSlug}?name=${encodeURIComponent(contributorName)}&bio=${encodeURIComponent(contributorBio)}`;
+              const initial = contributorName.charAt(0).toUpperCase();
+              return (
+                <div className="mt-12 p-8 rounded-lg border border-slate-200 bg-white">
+                  <div className="flex items-start gap-6">
+                    <Link href={authorHref} className="shrink-0">
+                      <div className="w-[120px] h-[120px] rounded-full bg-slate-200 flex items-center justify-center text-slate-400 font-black text-4xl overflow-hidden border border-slate-200 hover:ring-4 hover:ring-emerald-100 transition-all">
+                        {initial}
+                      </div>
+                    </Link>
+                    <div className="flex-1 min-w-0">
+                      <Link href={authorHref} className="inline-block text-xl font-black text-slate-900 hover:text-emerald-600 transition-colors">
+                        {contributorName}
+                      </Link>
+                      <p className="text-sm italic text-slate-500 mt-1 mb-4">
+                        <a href="https://sugartimes.co.in" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-600 transition-colors">http://sugartimes.co.in</a>
+                      </p>
+                      <p className="text-[15px] text-slate-700 leading-relaxed mb-5 whitespace-pre-line">
+                        {contributorBio}
+                      </p>
+                      <div className="flex items-center gap-4 text-slate-700">
+                        <a href="https://www.facebook.com/TheSugarTimes/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-emerald-600 transition-colors"><FacebookIcon size={18} /></a>
+                        <a href="https://www.instagram.com/sugartimesmagazine/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-emerald-600 transition-colors"><InstagramIcon size={18} /></a>
+                        <a href="https://in.linkedin.com/company/sugar-times-magazine" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="hover:text-emerald-600 transition-colors"><LinkedInIcon size={18} /></a>
+                        <a href="mailto:contact@sugartimes.co.in" aria-label="Email" className="hover:text-emerald-600 transition-colors"><MailIcon size={18} /></a>
+                        <a href="https://x.com/SugarTimes" target="_blank" rel="noopener noreferrer" aria-label="X" className="hover:text-emerald-600 transition-colors"><TwitterXIcon size={18} /></a>
+                        <a href="https://wa.me/917355453462" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="hover:text-emerald-600 transition-colors"><WhatsAppIcon size={18} /></a>
+                        <a href="https://www.youtube.com/@sugartimesmagazine2346" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="hover:text-emerald-600 transition-colors"><YouTubeIcon size={18} /></a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Related Articles */}
             {related.length > 0 && (

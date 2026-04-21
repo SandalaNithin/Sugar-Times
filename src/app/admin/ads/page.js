@@ -9,11 +9,13 @@ import {
   LayoutGrid, ExternalLink, Calendar, CheckCircle2, XCircle, Target, Sparkles,
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
+import DataExportImport from "@/components/DataExportImport";
 
 const PLACEMENTS = [
   { value: "middle", label: "Middle (In-Article Banner)", desc: "Shows between article paragraphs" },
   { value: "sidebar", label: "Sidebar (Social/Popular Rail)", desc: "Shows in the right sidebar" },
-  { value: "both", label: "Both", desc: "Middle and sidebar" },
+  { value: "home_banner", label: "Home Page Banner", desc: "Shows horizontally on the Home Page" },
+  { value: "both", label: "All Placements (Industrial)", desc: "Middle, Sidebar, and Home Banner (3-in-1)" },
 ];
 
 const EMPTY_FORM = {
@@ -132,6 +134,46 @@ export default function AdminAdsPage() {
     }
   };
 
+  const handleImport = async (parsedData, updateProgress) => {
+    let successCount = 0;
+    for (let i = 0; i < parsedData.length; i++) {
+        const item = parsedData[i];
+        try {
+            await adsAPI.create({
+                title: item["Title"] || "Untitled Ad",
+                image: item["Image URL"] || "",
+                link: item["Link"] || "",
+                placement: item["Placement"] || "middle",
+                categories: item["Categories"] ? item["Categories"].split(", ") : [],
+                priority: parseInt(item["Priority"]) || 0,
+                active: item["Active"] === "Yes",
+                startDate: item["Start Date"] || "",
+                endDate: item["End Date"] || "",
+            });
+            successCount++;
+        } catch (error) {
+            console.error("Failed to import ad row:", i, error);
+        }
+        updateProgress(i + 1);
+    }
+    if (successCount > 0) fetchAds();
+    if (successCount < parsedData.length) {
+        throw new Error(`Imported ${successCount}/${parsedData.length} successfully.`);
+    }
+  };
+
+  const exportMapping = (ad) => ({
+      "Title": ad.title,
+      "Image URL": ad.image || "",
+      "Link": ad.link || "",
+      "Placement": ad.placement || "middle",
+      "Categories": ad.categories?.length ? ad.categories.join(", ") : "",
+      "Priority": ad.priority || 0,
+      "Active": ad.active ? "Yes" : "No",
+      "Start Date": ad.startDate ? ad.startDate.slice(0, 10) : "",
+      "End Date": ad.endDate ? ad.endDate.slice(0, 10) : "",
+  });
+
   return (
     <AdminLayout>
       <Toaster position="top-right" />
@@ -147,13 +189,22 @@ export default function AdminAdsPage() {
             {ads.length} active slots &middot; Control in-article &amp; sidebar ads per category
           </p>
         </div>
-        <button
-          onClick={openCreate}
-          className="flex items-center gap-3 bg-[#1b5e20] hover:bg-black text-white font-black px-6 py-3.5 rounded-xl text-[11px] uppercase tracking-widest transition-all shadow-lg active:scale-95 group"
-        >
-          <Plus size={16} className="group-hover:rotate-90 transition-transform duration-300" />
-          New Advertisement
-        </button>
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
+          <DataExportImport
+            title="Advertisements"
+            data={ads}
+            exportMapping={exportMapping}
+            onImport={handleImport}
+            isLoading={loading}
+          />
+          <button
+            onClick={openCreate}
+            className="flex items-center gap-3 bg-[#1b5e20] hover:bg-black text-white font-black px-6 py-3.5 rounded-xl text-[11px] uppercase tracking-widest transition-all shadow-lg active:scale-95 group"
+          >
+            <Plus size={16} className="group-hover:rotate-90 transition-transform duration-300" />
+            New Advertisement
+          </button>
+        </div>
       </div>
 
       {/* Grid */}
@@ -295,7 +346,7 @@ export default function AdminAdsPage() {
                 <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">
                   <Sparkles size={11} /> Placement
                 </label>
-                <div className="grid md:grid-cols-3 gap-3">
+                <div className="grid md:grid-cols-4 gap-3">
                   {PLACEMENTS.map((p) => (
                     <button
                       key={p.value}

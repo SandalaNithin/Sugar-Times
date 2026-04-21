@@ -9,6 +9,7 @@ import { Plus, Edit, Trash2, Eye, Search, Loader2, X, Save, TrendingUp, FileText
 import toast, { Toaster } from "react-hot-toast";
 import RichTextEditor from "@/components/RichTextEditor";
 import MediaExplorer from "@/components/MediaExplorer";
+import DataExportImport from "@/components/DataExportImport";
 import { CATEGORY_TREE } from "@/lib/categories";
 
 // Convert static tree to the shape we need: [{label, slug, emoji, children: [{label, slug}]}]
@@ -59,6 +60,9 @@ function ArticlesContent() {
     image: "",
     premium: false,
     trending: false,
+    showContributor: true,
+    contributorName: "",
+    contributorBio: "",
     status: "published",
   });
   const [saving, setSaving] = useState(false);
@@ -125,6 +129,9 @@ function ArticlesContent() {
       image: article.image || article.imageUrl || "",
       premium: !!article.premium,
       trending: !!article.trending,
+      showContributor: article.showContributor !== false,
+      contributorName: article.contributorName || "",
+      contributorBio: article.contributorBio || "",
       status: article.status || "published",
     });
     setShowForm(true);
@@ -155,24 +162,89 @@ function ArticlesContent() {
     }
   };
 
+  const handleImport = async (parsedData, updateProgress) => {
+    let successCount = 0;
+    for (let i = 0; i < parsedData.length; i++) {
+        const item = parsedData[i];
+        try {
+            await articlesAPI.create({
+                title: item["Headline"] || item.title || "Untitled",
+                category: item["Category"] || item.category || DEFAULT_CATEGORY,
+                subcategory: item["Sub-Category"] || item.subcategory || "",
+                excerpt: item["Excerpt"] || item.excerpt || "",
+                content: item["Content"] || item.content || "<p></p>",
+                image: item["Image URL"] || item.image || "",
+                premium: item["Premium"] === "Yes" || item.premium === true,
+                trending: item["Trending"] === "Yes" || item.trending === true,
+                showContributor: item["Show Contributor"] !== "No",
+                contributorName: item["Contributor Name"] || "",
+                contributorBio: item["Contributor Bio"] || "",
+                status: item["Status"] || "published"
+            });
+            successCount++;
+        } catch (error) {
+            console.error("Failed to import article row:", i, error);
+        }
+        updateProgress(i + 1);
+    }
+    if (successCount > 0) fetchArticles();
+    if (successCount < parsedData.length) {
+        throw new Error(`Imported ${successCount}/${parsedData.length} successfully.`);
+    }
+  };
+
+  const exportMapping = (article) => ({
+      "Headline": article.title,
+      "Category": article.category,
+      "Sub-Category": article.subcategory || "",
+      "Excerpt": article.excerpt || "",
+      "Content": article.content || "",
+      "Image URL": article.image || article.imageUrl || "",
+      "Premium": article.premium ? "Yes" : "No",
+      "Trending": article.trending ? "Yes" : "No",
+      "Status": article.status || "published",
+      "Show Contributor": article.showContributor ? "Yes" : "No",
+      "Contributor Name": article.contributorName || "",
+      "Contributor Bio": article.contributorBio || ""
+  });
+
   const handleCreate = async (e, type = "published") => {
     if (e) e.preventDefault();
     setSaving(true);
     if (type === "draft") setIsDrafting(true);
-    
+
     try {
-      const payload = { ...form, status: type };
-      if (form.id) {
-        await articlesAPI.update(form.id, payload);
+      // Strip the synthetic `id` field (used only on the client to distinguish
+      // create vs. update) so the backend only sees real article fields.
+      const { id: _ignored, ...formPayload } = form;
+      const payload = { ...formPayload, status: type };
+
+      const { data: saved } = form.id
+        ? await articlesAPI.update(form.id, payload)
+        : await articlesAPI.create(payload);
+
+      // If the admin opted to show a contributor but the saved document came
+      // back without the field, the server is running with an outdated schema
+      // (fields stripped by Mongoose strict mode). Surface it immediately so
+      // the issue is obvious instead of silently losing data.
+      if (
+        payload.showContributor &&
+        saved &&
+        !("contributorName" in saved) &&
+        !("contributorBio" in saved)
+      ) {
+        toast.error("Saved, but contributor fields were dropped. Restart the backend to pick up the new schema.", {
+          duration: 6000,
+          style: { borderRadius: '16px', background: '#7f1d1d', color: '#fff', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' },
+        });
       } else {
-        await articlesAPI.create(payload);
+        toast.success(type === "draft" ? "Draft saved successfully!" : "Article published successfully!", {
+          style: { borderRadius: '16px', background: '#1e293b', color: '#fff', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' },
+          iconTheme: { primary: '#22c55e', secondary: '#fff' }
+        });
       }
-      toast.success(type === "draft" ? "Draft saved successfully!" : "Article published successfully!", {
-        style: { borderRadius: '16px', background: '#1e293b', color: '#fff', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' },
-        iconTheme: { primary: '#22c55e', secondary: '#fff' }
-      });
       setShowForm(false);
-      setForm({ id: "", title: "", category: DEFAULT_CATEGORY, subcategory: "", excerpt: "", content: "", image: "", premium: false, trending: false, status: "published" });
+      setForm({ id: "", title: "", category: DEFAULT_CATEGORY, subcategory: "", excerpt: "", content: "", image: "", premium: false, trending: false, showContributor: true, contributorName: "", contributorBio: "", status: "published" });
       fetchArticles();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to save article");
@@ -316,6 +388,7 @@ function ArticlesContent() {
                     </div>
                     <span className="text-xs font-black text-red-600 uppercase tracking-widest group-hover:text-red-700">Breaking News</span>
                   </label>
+
                 </div>
               </div>
 
@@ -341,13 +414,57 @@ function ArticlesContent() {
 
               <div>
                 <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">Extended Content <span className="text-red-500">*</span></label>
-                <RichTextEditor 
+                <RichTextEditor
                   ref={editorRef}
-                  value={form.content} 
+                  value={form.content}
                   onChange={(val) => setForm({ ...form, content: val })}
                   onImageUpload={handleInlineImageClick}
                   placeholder="Paste your full article text here. Use shifts for new lines..."
                 />
+              </div>
+
+              {/* Authorized Contributor — editable block rendered at the bottom
+                  of the article page. Toggle controls visibility; the two
+                  fields below drive the card content on publish. */}
+              <div className="rounded-2xl border-2 border-slate-50 bg-slate-50/40 p-6 space-y-5">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Authorized Contributor</h3>
+                    <p className="text-[11px] text-slate-500 font-medium mt-1">Shown as a card at the bottom of the article page.</p>
+                  </div>
+                  <label className="flex items-center gap-3 cursor-pointer group shrink-0">
+                    <div className={`w-10 h-6 rounded-full relative transition-colors duration-300 ${form.showContributor ? "bg-emerald-600" : "bg-slate-200"}`}>
+                      <input type="checkbox" className="hidden" checked={form.showContributor} onChange={(e) => setForm({ ...form, showContributor: e.target.checked })} />
+                      <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-md ${form.showContributor ? "left-5" : "left-1"}`}></div>
+                    </div>
+                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">{form.showContributor ? "Visible" : "Hidden"}</span>
+                  </label>
+                </div>
+
+                {form.showContributor && (
+                  <>
+                    <div>
+                      <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Contributor Name</label>
+                      <input
+                        value={form.contributorName}
+                        onChange={(e) => setForm({ ...form, contributorName: e.target.value })}
+                        placeholder="Sugar Times Team"
+                        className="w-full px-5 py-4 border-2 border-slate-50 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-emerald-400/10 focus:border-emerald-500 bg-white transition-all"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Description</label>
+                      <textarea
+                        rows={3}
+                        value={form.contributorBio}
+                        onChange={(e) => setForm({ ...form, contributorBio: e.target.value })}
+                        placeholder="Covering India's sugar & bio-energy industry — market news, policy updates, and agricultural intelligence for the industry."
+                        className="w-full px-5 py-4 border-2 border-slate-50 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-emerald-400/10 focus:border-emerald-500 bg-white transition-all resize-none"
+                      />
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="flex gap-4 pt-4">
@@ -376,12 +493,19 @@ function ArticlesContent() {
       />
 
       <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-        <div className="p-4 border-b border-slate-100">
-          <div className="relative max-w-sm">
+        <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="relative w-full max-w-sm">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search articles..."
               className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400" />
           </div>
+          <DataExportImport
+            title="Articles"
+            data={filtered}
+            exportMapping={exportMapping}
+            onImport={handleImport}
+            isLoading={loading}
+          />
         </div>
         {loading ? (
           <div className="flex items-center justify-center py-16"><Loader2 size={28} className="animate-spin text-green-500" /></div>

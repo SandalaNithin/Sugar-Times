@@ -4,6 +4,7 @@ import AdminLayout from "@/components/AdminLayout";
 import { adminAPI } from "@/lib/api";
 import { unwrapList } from "@/lib/unwrapList";
 import { CheckCircle2, Clock, XCircle, Loader2, AlertCircle, RefreshCw, Search, ArrowRight, X, Filter, IndianRupee } from "lucide-react";
+import DataExportImport from "@/components/DataExportImport";
 
 const formatDate = (dateString) => {
   if (!dateString) return "—";
@@ -82,6 +83,19 @@ export default function AdminPayments() {
     setStatus("");
   };
 
+  const exportMapping = (p) => ({
+      "Transaction ID": p.razorpayPaymentId || "OFFLINE_REFERENCE",
+      "Order ID": p.razorpayOrderId || "",
+      "User Name": p.userId?.name || "Anonymous Guest",
+      "User Email": p.userId?.email || "No email",
+      "Amount": (p.amount / 100).toLocaleString() || "0",
+      "Status": p.status || "",
+      "Date": p.createdAt ? formatDate(p.createdAt) : "",
+      "Time": p.createdAt ? formatTime(p.createdAt) : "",
+      "Failure Reason": p.failureReason || "",
+      "System ID": p._id || ""
+  });
+
   const getStatusDisplay = (status) => {
     switch (status) {
       case "success":
@@ -102,18 +116,28 @@ export default function AdminPayments() {
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">Financial Ledger</h1>
           <p className="text-slate-500 text-sm mt-1">Real-time transaction monitoring and revenue reconciliation.</p>
         </div>
-        <button 
-          onClick={fetchData}
-          className="flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm"
-        >
-          <RefreshCw size={16} className={loading ? "animate-spin" : ""} /> Sync Data
-        </button>
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
+          <DataExportImport
+            title="Payments"
+            data={payments}
+            exportMapping={exportMapping}
+            isLoading={loading}
+          />
+          <button 
+            onClick={fetchData}
+            className="flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm"
+          >
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} /> Sync Data
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         {[
-          { label: "Total Amount", value: `₹${((stats?.totalLedgerAmount || 0) / 100).toLocaleString("en-IN")}`, icon: IndianRupee, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100" },          { label: "Successful Txns", value: stats?.successfulTxns || 0, icon: CheckCircle2, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100" },
-          { label: "Pending Issues", value: (stats?.pendingTxns || 0) + (stats?.failedTxns || 0), icon: Clock, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-100" },
+          { label: "Total Amount", value: `₹${((stats?.totalLedgerAmount || 0) / 100).toLocaleString("en-IN")}`, icon: IndianRupee, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100" },
+          { label: "Successful Txns", value: stats?.successfulTxns || 0, icon: CheckCircle2, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100" },
+          { label: "Pending", value: stats?.pendingTxns || 0, icon: Clock, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-100" },
+          { label: "Failed", value: stats?.failedTxns || 0, icon: XCircle, color: "text-red-600", bg: "bg-red-50", border: "border-red-100" },
         ].map((item) => (
           <div key={item.label} className={`rounded-2xl border ${item.bg} ${item.border} p-6 flex items-center gap-4`}>
              <div className="w-12 h-12 rounded-xl bg-white/50 flex items-center justify-center shadow-inner">

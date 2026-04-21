@@ -162,6 +162,24 @@ const translations = {
 
 const LanguageContext = createContext(null);
 
+// Google Translate reads the googtrans cookie on load. Setting it on both the
+// hostname and the parent domain covers localhost + deployed envs. A reload is
+// required because the widget only applies the cookie at page load.
+const setGoogTransCookie = (value) => {
+  if (typeof document === "undefined") return;
+  const host = window.location.hostname;
+  const parent = host.split(".").slice(-2).join(".");
+  const expire = value
+    ? "expires=Fri, 31 Dec 9999 23:59:59 GMT"
+    : "expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  const val = value || "";
+  document.cookie = `googtrans=${val}; path=/; ${expire}`;
+  document.cookie = `googtrans=${val}; path=/; domain=${host}; ${expire}`;
+  if (parent && parent !== host) {
+    document.cookie = `googtrans=${val}; path=/; domain=.${parent}; ${expire}`;
+  }
+};
+
 export function LanguageProvider({ children }) {
   const [lang, setLangState] = useState("en");
 
@@ -172,7 +190,14 @@ export function LanguageProvider({ children }) {
 
   const setLang = (next) => {
     setLangState(next);
-    if (typeof window !== "undefined") localStorage.setItem("lang", next);
+    if (typeof window === "undefined") return;
+    localStorage.setItem("lang", next);
+    if (next === "hi") {
+      setGoogTransCookie("/en/hi");
+    } else {
+      setGoogTransCookie("");
+    }
+    window.location.reload();
   };
 
   const toggleLang = () => setLang(lang === "en" ? "hi" : "en");

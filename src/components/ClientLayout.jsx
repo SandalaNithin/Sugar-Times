@@ -2,6 +2,7 @@
 import { usePathname } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import GoogleTranslate from "@/components/GoogleTranslate";
 import { AuthProvider } from "@/context/AuthContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 
@@ -15,6 +16,7 @@ export default function ClientLayout({ children }) {
   return (
     <LanguageProvider>
       <AuthProvider>
+        <GoogleTranslate />
         {!isTakeoverPage && <Navbar />}
         <main className={isTakeoverPage ? "min-h-screen grow flex flex-col" : "grow flex flex-col"}>
           {children}

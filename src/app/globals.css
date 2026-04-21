@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+/* Google Translate widget: keep the in-page toggle but hide Google's top
+   banner/tooltip so the layout isn't pushed down and the nav stays sticky. */
+#google_translate_element,
+#google-translate-element { display: none !important; }
+.goog-te-banner-frame.skiptranslate,
+.goog-te-gadget,
+.goog-tooltip,
+.goog-tooltip:hover,
+.goog-text-highlight { display: none !important; visibility: hidden !important; box-shadow: none !important; background: transparent !important; }
+body { top: 0 !important; }
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

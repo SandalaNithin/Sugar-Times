@@ -13,6 +13,9 @@ const FacebookIcon = ({ size }) => (<svg width={size} height={size} viewBox="0 0
 const LinkedInIcon = ({ size }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>);
 const TwitterXIcon = ({ size }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.261 5.632 5.903-5.632Zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>);
 const YouTubeIcon = ({ size }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/></svg>);
+const WhatsAppIcon = ({ size }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor"><path d="M20.52 3.449A11.8 11.8 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892a11.88 11.88 0 0 0 1.587 5.946L.057 24l6.304-1.654a11.9 11.9 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.336 11.893-11.893a11.82 11.82 0 0 0-3.422-8.452M12.05 21.785h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.999-3.648-.235-.374a9.86 9.86 0 0 1-1.511-5.26c.002-5.45 4.437-9.884 9.889-9.884a9.82 9.82 0 0 1 6.988 2.898 9.82 9.82 0 0 1 2.895 6.992c-.003 5.452-4.437 9.886-9.888 9.886m5.424-7.403c-.297-.149-1.758-.867-2.031-.967-.273-.099-.471-.148-.67.15-.197.297-.767.967-.94 1.166-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.149-.173.198-.297.298-.495.099-.198.05-.372-.025-.521-.074-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347"/></svg>
+);
 
 // Build nav link from API category tree node
 const apiCategoryToNav = (cat) => ({
@@ -161,7 +164,7 @@ export default function Navbar() {
               <a href="https://in.linkedin.com/company/sugar-times-magazine" target="_blank" rel="noopener noreferrer" title="LinkedIn" className="hover:text-white transition-colors"><LinkedInIcon size={13} /></a>
               <a href="https://x.com/SugarTimes" target="_blank" rel="noopener noreferrer" title="Twitter / X" className="hover:text-white transition-colors"><TwitterXIcon size={13} /></a>
               <a href="https://www.youtube.com/@sugartimesmagazine2346" target="_blank" rel="noopener noreferrer" title="YouTube" className="hover:text-white transition-colors"><YouTubeIcon size={13} /></a>
-              <a href="https://wa.me/917355453462" target="_blank" rel="noopener noreferrer" title="WhatsApp" className="hover:text-white transition-colors font-black text-[12px] leading-none">w</a>
+              <a href="https://wa.me/917355453462" target="_blank" rel="noopener noreferrer" title="WhatsApp" className="hover:text-white transition-colors"><WhatsAppIcon size={14} /></a>
             </div>
 
             <button

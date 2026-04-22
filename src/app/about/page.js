@@ -182,13 +182,13 @@ export default async function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
             {/* ── LEFT: Main Image Feature ── */}
-            <div className="relative flex justify-center items-center h-full min-h-[400px]">
+            <div className="relative flex justify-center items-center h-full min-h-[500px] lg:min-h-[700px]">
               {/* Giant soft glow behind the collage */}
               <div
                 className="absolute"
                 style={{
                   width: "200%", height: "400%",
-                  maxHeight: "700px",
+                  maxHeight: "800px",
                   borderRadius: "100%",
                   background: "radial-gradient(circle, rgba(74,222,128,0.15) 0%, transparent 100%)",
                   filter: "blur(50px)",
@@ -198,13 +198,13 @@ export default async function AboutPage() {
               {/* Image Frame */}
               <div
                 className="relative z-15 group mx-auto flex items-center justify-center transition-transform hover:scale-[1.02] duration-700 w-full"
-                style={{ maxWidth: "600px" }} // Much larger layout scale
+                style={{ maxWidth: "850px" }} // Increased from 600px
               >
                 <img
                   src="/about/magazine-collage.png"
                   alt="Sugar Times Magazine Collection"
-                  className="w-full h-auto relative z-20 drop-shadow-[0_30px_45px_rgba(0,0,0,0.65)]"
-                  style={{ display: "block", objectFit: "contain" }}
+                  className="w-full h-auto lg:h-full lg:object-contain relative z-20 drop-shadow-[0_30px_45px_rgba(0,0,0,0.65)]"
+                  style={{ display: "block" }}
                 />
                 
                 {/* Est. Badge attached directly to the image container */}
@@ -439,7 +439,12 @@ export default async function AboutPage() {
                   desc: "Video content covering industry events, interviews & mill tours",
                 },
                 {
-                  icon: "💬",
+                  icon: (
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                      <path d="M16 31c8.284 0 15-6.716 15-15S24.284 1 16 1 1 7.716 1 16c0 2.826.787 5.465 2.152 7.717L1 31l7.534-1.936A14.935 14.935 0 0 0 16 31z" fill="#25D366"/>
+                      <path d="M23.52 19.2c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.8-1.67-2.1-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.6-.92-2.2-.24-.58-.48-.5-.67-.51h-.57c-.2 0-.52.07-.8.37s-1.05 1.02-1.05 2.5c0 1.47 1.07 2.9 1.22 3.1.15.2 2.1 3.2 5.1 4.5.71.3 1.26.48 1.7.62.71.23 1.36.2 1.87.12.57-.08 1.76-.72 2.01-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z" fill="white"/>
+                    </svg>
+                  ),
                   title: "WhatsApp & Social",
                   desc: "Instant news updates directly to industry professionals",
                 },
@@ -790,7 +795,7 @@ export default async function AboutPage() {
                   {
                     icon: (
                       <svg width="20" height="20" viewBox="0 0 32 32" fill="currentColor">
-                        <path d="M16 3C9.37 3 4 8.37 4 15c0 2.64.86 5.08 2.32 7.06L5 29l7.13-1.27A11.94 11.94 0 0016 27c6.63 0 12-5.37 12-12S22.63 3 16 3z" />
+                        <path d="M16 3C9.373 3 4 8.373 4 15c0 2.385.832 4.584 2.214 6.347L4.05 28l6.91-1.816A11.93 11.93 0 0 0 16 27c6.627 0 12-5.373 12-12S22.627 3 16 3zm0 21.5a9.43 9.43 0 0 1-4.78-1.294l-.343-.203-3.56.935.952-3.479-.223-.358A9.444 9.444 0 0 1 6.5 15c0-5.238 4.262-9.5 9.5-9.5s9.5 4.262 9.5 9.5-4.262 9.5-9.5 9.5zm5.197-7.115c-.285-.143-1.688-.833-1.95-.927-.262-.095-.453-.143-.644.143-.19.285-.738.927-.904 1.118-.167.19-.333.214-.617.071-.285-.143-1.202-.443-2.29-1.413-.846-.754-1.418-1.688-1.584-1.972-.166-.285-.018-.439.125-.581.128-.128.285-.333.428-.5.143-.166.19-.285.285-.476.095-.19.048-.357-.024-.5-.071-.143-.644-1.551-.882-2.122-.232-.553-.47-.477-.644-.486l-.548-.01c-.19 0-.5.072-.762.357-.262.285-1 .977-1 2.382s1.024 2.764 1.167 2.955c.143.19 2.016 3.078 4.885 4.316.683.295 1.215.47 1.63.602.685.218 1.308.187 1.802.113.55-.082 1.688-.69 1.927-1.356.238-.667.238-1.238.166-1.356-.071-.119-.262-.19-.548-.333z"/>
                       </svg>
                     ),
                     label: "WhatsApp",

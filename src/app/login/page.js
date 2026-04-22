@@ -191,7 +191,7 @@ export default function LoginPage() {
 
           {/* Footer Links */}
           <div className="mt-6 flex flex-col items-center gap-3 text-center">
-            <Link href="/policy" className="text-xs font-semibold text-slate-500 hover:text-emerald-600 hover:underline">
+            <Link href="/privacy-policy" className="text-xs font-semibold text-slate-500 hover:text-emerald-600 hover:underline">
               Privacy Policy
             </Link>
             <div className="w-full h-px bg-slate-100" />

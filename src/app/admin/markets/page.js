@@ -14,7 +14,7 @@ const EMPTY_FORM = {
   maxPrice: "",
   avgPrice: "",
   description: "",
-  unit: "per quintal",
+  unit: "",
 };
 
 export default function AdminMarkets() {
@@ -68,7 +68,7 @@ export default function AdminMarkets() {
       maxPrice: m.maxPrice ?? "",
       avgPrice: m.price ?? "",
       description: m.description || "",
-      unit: m.unit || "per quintal",
+      unit: m.unit || "",
     });
     setShowForm(true);
   };
@@ -152,7 +152,7 @@ export default function AdminMarkets() {
           minPrice: min,
           maxPrice: max,
           description: item["Description"] || item.description || "",
-          unit: item["Unit"] || item.unit || "per quintal",
+          unit: item["Unit"] || item.unit || "",
         });
         successCount++;
       } catch (error) {

@@ -455,37 +455,11 @@ export default async function HomePage() {
               );
             })}
 
-            {/* ── Highlights Hub (dark section) ─────────────────────────── */}
-            {sections.filter((s) => s.allArticles.length > 0).length > 0 && (
-              <section>
-                <div className="bg-slate-900 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl -mr-20 -mt-20" />
-                  <h2 className="text-white text-2xl font-black uppercase tracking-widest mb-8 flex items-center gap-3">
-                    <span className="w-2 h-8 bg-green-500 rounded-full" />
-                    Highlights
-                  </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {sections.filter((s) => s.allArticles.length > 0).slice(0, 6).map((s) => (
-                      <div key={`hl-${s._id}`} className="space-y-3">
-                        <Link href={`/news?category=${encodeURIComponent(s.name)}`} className="text-green-400 font-bold text-xs uppercase tracking-widest hover:underline flex items-center gap-2">
-                          {s.emoji} {s.name} <ArrowRight size={11} />
-                        </Link>
-                        {s.allArticles.slice(0, 2).map((a) => (
-                          <Link key={a._id} href={`/article/${a._id}`} className="group block">
-                            <h4 className="text-white text-[13px] font-bold group-hover:text-green-400 transition-colors line-clamp-2">{a.title}</h4>
-                            <p className="text-white/40 text-[10px] mt-1">{a.date}</p>
-                          </Link>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </section>
-            )}
+
           </div>
 
-          {/* ── RIGHT SIDEBAR ────────────────────────────────────────────── */}
-          <aside className="w-full lg:w-[320px] shrink-0 space-y-8">
+          {/* ── RIGHT SIDEBAR (Sticky) ────────────────────────────────────── */}
+          <aside className="w-full lg:w-[320px] shrink-0 space-y-8 lg:sticky lg:top-24 h-fit">
 
             {/* My account */}
             <div className="hidden lg:flex justify-end">
@@ -494,6 +468,35 @@ export default async function HomePage() {
                 My account
               </Link>
             </div>
+
+            {/* ── Highlights Hub (Sticky Sidebar) ─────────────────────────── */}
+            {sections.filter((s) => s.allArticles.length > 0).length > 0 && (
+              <div className="bg-slate-900 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-2xl -mr-10 -mt-10" />
+                <h2 className="text-white text-base font-black uppercase tracking-widest mb-6 flex items-center gap-2">
+                  <span className="w-1.5 h-6 bg-green-500 rounded-full" />
+                  Highlights
+                </h2>
+                <div className="space-y-8">
+                  {sections.filter((s) => s.allArticles.length > 0).slice(0, 5).map((s) => (
+                    <div key={`hl-sticky-${s._id}`} className="space-y-3 border-b border-white/5 pb-5 last:border-0 last:pb-0">
+                      <Link href={`/news?category=${encodeURIComponent(s.name)}`} className="text-green-400 font-bold text-[10px] uppercase tracking-widest hover:underline flex items-center gap-2">
+                        {s.emoji} {s.name} <ArrowRight size={10} />
+                      </Link>
+                      {s.allArticles.slice(0, 2).map((a) => (
+                        <Link key={a._id} href={`/article/${a._id}`} className="group block">
+                          <h4 className="text-white/90 text-xs font-bold group-hover:text-green-400 transition-colors line-clamp-2 leading-snug">{a.title}</h4>
+                          <p className="text-white/30 text-[9px] mt-1">{a.date}</p>
+                        </Link>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+                <Link href="/news" className="mt-6 block text-center text-[10px] font-black text-green-500 uppercase tracking-widest hover:text-green-400 transition-colors">
+                  View News Hub <ChevronRight size={12} className="inline ml-1" />
+                </Link>
+              </div>
+            )}
 
             {/* Magazines — Latest to oldest */}
             {magazines.length > 0 && (
@@ -627,6 +630,7 @@ export default async function HomePage() {
                 <div><h2 className="text-2xl font-black text-slate-900">Market Insights</h2><p className="text-slate-500 text-sm mt-1">Live sugarcane prices across states</p></div>
                 <Link href="/markets" className="flex items-center gap-1 text-green-600 font-semibold text-sm">Full Markets <ChevronRight size={16} /></Link>
               </div>
+
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                   <div className="overflow-x-auto">
@@ -672,6 +676,7 @@ export default async function HomePage() {
                   <Link href="/markets" className="mt-5 block text-center text-sm text-green-600 font-semibold hover:underline">View Full Charts</Link>
                 </div>
               </div>
+
             </section>
           )}
 

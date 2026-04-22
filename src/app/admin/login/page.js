@@ -140,7 +140,7 @@ export default function AdminLoginPage() {
 
           {/* Privacy Policy */}
           <div className="mt-4 text-center">
-            <Link href="/policy" className="text-xs text-purple-600 hover:underline">
+            <Link href="/privacy-policy" className="text-xs text-purple-600 hover:underline">
               Privacy Policy
             </Link>
           </div>

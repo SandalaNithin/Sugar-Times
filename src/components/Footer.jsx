@@ -145,7 +145,7 @@ export default function Footer() {
             © {new Date().getFullYear()} Sugar Times Magazine. All rights reserved. | Published from Prayagraj, UP
           </div>
           <div className="flex items-center gap-5">
-            <Link href="/policy" className="hover:text-emerald-400 transition-colors">Privacy Policy</Link>
+            <Link href="/privacy-policy" className="hover:text-emerald-400 transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-emerald-400 transition-colors">Terms &amp; Conditions</Link>
             <Link href="/sitemap" className="hover:text-emerald-400 transition-colors">Sitemap</Link>
           </div>

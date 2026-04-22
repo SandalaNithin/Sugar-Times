@@ -68,7 +68,7 @@ function CategoryTreeNav({ currentHref }) {
           }))
         );
       }
-    }).catch(() => {});
+    }).catch(() => { });
   }, []);
 
   const [openSlug, setOpenSlug] = useState(() => {
@@ -96,11 +96,10 @@ function CategoryTreeNav({ currentHref }) {
             <button
               type="button"
               onClick={() => setOpenSlug(isOpen ? null : parent.slug)}
-              className={`w-full flex items-center justify-between gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors ${
-                groupActive
+              className={`w-full flex items-center justify-between gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-colors ${groupActive
                   ? "bg-white/10 text-white"
                   : "text-emerald-100 hover:bg-white/5 hover:text-white"
-              }`}
+                }`}
             >
               <span className="flex items-center gap-2.5 truncate">
                 <span className="text-sm">{parent.emoji}</span>
@@ -116,11 +115,10 @@ function CategoryTreeNav({ currentHref }) {
               <div className="ml-3 pl-3 border-l border-emerald-700/50 mt-1 mb-1 space-y-0.5">
                 <Link
                   href={parentHref}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-[11px] font-semibold transition-colors ${
-                    isParentActive
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-[11px] font-semibold transition-colors ${isParentActive
                       ? "bg-emerald-600/40 text-white"
                       : "text-emerald-200/80 hover:bg-white/5 hover:text-white"
-                  }`}
+                    }`}
                 >
                   <ChevronRight size={10} className="text-emerald-300/60" />
                   All {parent.label}
@@ -132,11 +130,10 @@ function CategoryTreeNav({ currentHref }) {
                     <Link
                       key={child.slug}
                       href={href}
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-[11px] transition-colors ${
-                        active
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-[11px] transition-colors ${active
                           ? "bg-emerald-600/40 text-white font-bold"
                           : "text-emerald-200/70 hover:bg-white/5 hover:text-white"
-                      }`}
+                        }`}
                     >
                       <ChevronRight size={10} className="text-emerald-300/50" />
                       {child.label}
@@ -163,11 +160,10 @@ function SidebarNav({ handleLogout }) {
       <Link
         href={href}
         prefetch={false}
-        className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-medium transition-colors ${
-          isActive
+        className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-medium transition-colors ${isActive
             ? "bg-white/10 text-white shadow-sm border border-white/10"
             : "text-emerald-100 hover:bg-white/5 hover:text-white"
-        }`}
+          }`}
       >
         <Icon size={16} className={isActive ? "text-emerald-300" : "text-emerald-400/70"} />
         <span className="truncate">{label}</span>
@@ -279,11 +275,10 @@ export default function AdminLayout({ children }) {
             type="button"
             onClick={toggleSidebar}
             title={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-            className={`w-10 h-10 flex items-center justify-center rounded-xl transition-colors border ${
-              sidebarOpen
+            className={`w-10 h-10 flex items-center justify-center rounded-xl transition-colors border ${sidebarOpen
                 ? "bg-white hover:bg-slate-50 text-slate-700 border-slate-200"
                 : "bg-emerald-700 hover:bg-emerald-800 text-white border-emerald-800 shadow-lg"
-            }`}
+              }`}
           >
             {sidebarOpen ? <PanelLeftClose size={18} /> : <Menu size={18} />}
           </button>

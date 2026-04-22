@@ -140,7 +140,7 @@ function ArticlesContent() {
   const fetchArticles = async () => {
     setLoading(true);
     try {
-      const params = { limit: 100 };
+      const params = { limit: 100, admin: "true" };
       if (urlCategory) params.category = urlCategory;
       const { data } = await articlesAPI.getAll(params);
       const list = Array.isArray(data?.articles)
@@ -284,21 +284,26 @@ function ArticlesContent() {
     }
   };
 
-  // Server already filters by category. We only apply the local search
-  // box and the trending flag here.
+  // Server already filters by category (including children). We only apply
+  // the local search box and the trending flag here.
+  // IMPORTANT: do NOT do a strict category === urlCategory check here —
+  // the server returns sub-category articles too (e.g. "Market Trends" when
+  // urlCategory is "Market & Prices"). Just trust the server response.
   const filtered = articles.filter((a) => {
-    const matchesSearch = a.title?.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = !search || a.title?.toLowerCase().includes(search.toLowerCase());
     const matchesTrending = urlTrending ? a.trending === true : true;
-    // Defensive client-side category re-check in case a stale result slips
-    // through (e.g. when the API fallback returns mock data).
-    const matchesCategory = urlCategory
-      ? a.category === urlCategory || a.subcategory === urlCategory
-      : true;
-    return matchesSearch && matchesCategory && matchesTrending;
+    return matchesSearch && matchesTrending;
   });
 
   const activeParent = categoryTree.find((p) => p.label === form.category);
   const subOptions = activeParent?.children || [];
+
+  const isParent = categoryTree.some((p) => p.label === urlCategory);
+  const displayTitle = urlTrending 
+    ? "Breaking News" 
+    : urlCategory 
+      ? (isParent ? `All ${urlCategory}` : urlCategory)
+      : "Central Article Desk";
 
   return (
     <>
@@ -306,7 +311,7 @@ function ArticlesContent() {
         <div>
           <h1 className="text-2xl font-black text-slate-900 flex items-center gap-3">
             {urlTrending ? <TrendingUp className="text-red-500" /> : <FileText className="text-green-500" />}
-            {urlTrending ? "Breaking News" : (urlCategory || "Central Article Desk")}
+            {displayTitle}
           </h1>
           <p className="text-slate-500 text-sm mt-1 font-medium italic">
             Managing {urlCategory ? `the "${urlCategory}" segment` : "all editorial content"} • {filtered.length} entries
@@ -540,6 +545,9 @@ function ArticlesContent() {
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex flex-col gap-1">
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full w-max ${a.status === "draft" ? "bg-amber-100 text-amber-700 border border-amber-200" : "bg-emerald-100 text-emerald-700 border border-emerald-200"}`}>
+                          {a.status === "draft" ? "DRAFT" : "PUBLISHED"}
+                        </span>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full w-max ${a.premium ? "bg-slate-900 text-green-400" : "bg-green-100 text-green-700"}`}>
                           {a.premium ? "Premium" : "Free"}
                         </span>

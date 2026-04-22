@@ -38,7 +38,7 @@ export default function AdminMarkets() {
         (p.children || []).forEach((c) => c?.name && names.push(c.name));
       });
       if (names.length) setCommodityOptions(Array.from(new Set(names)));
-    }).catch(() => {/* keep fallback */});
+    }).catch(() => {/* keep fallback */ });
   }, []);
 
   const fetchMarkets = async () => {

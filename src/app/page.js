@@ -6,7 +6,9 @@ import { CATEGORY_TREE } from "@/lib/categories";
 /* ═══════════════════════════════════════════════════════════════════════════
    DATA FETCHING — Server-side, always fresh
    ═══════════════════════════════════════════════════════════════════════════ */
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://st-be-kh3k.onrender.com";
+
+export const revalidate = 60;
 
 async function fetchJSON(url) {
   try {

@@ -13,10 +13,7 @@ export const metadata = {
 async function getMagazines() {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-    const res = await fetch(`${apiUrl}/magazines`, {
-      cache: "no-store",
-      next: { revalidate: 0 },
-    });
+    const res = await fetch(`${apiUrl}/magazines`);
     const data = res.ok ? await res.json() : [];
     return Array.isArray(data) ? data : [];
   } catch {

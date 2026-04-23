@@ -9,10 +9,18 @@ import ArticleSidebar from "@/components/article/ArticleSidebar";
 import ArticleInlineAd from "@/components/article/ArticleInlineAd";
 import ArticleCommentForm from "@/components/article/ArticleCommentForm";
 
-// Render each article on demand so newly-published admin content is
-// immediately visible without rebuilding. No generateStaticParams is
-// needed because the site is no longer using `output: "export"`.
-export const dynamic = "force-dynamic";
+export async function generateStaticParams() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  try {
+    const res = await fetch(`${apiUrl}/articles?limit=1000`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    const list = Array.isArray(data?.articles) ? data.articles : Array.isArray(data) ? data : [];
+    return list.map((a) => ({ id: (a._id || a.id).toString() }));
+  } catch {
+    return [];
+  }
+}
 
 const getImageUrl = (url) => {
   if (!url) return "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800";
@@ -22,7 +30,7 @@ const getImageUrl = (url) => {
 
 async function safeFetch(url) {
   try {
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url);
     if (!res.ok) return null;
     return await res.json();
   } catch {

@@ -10,9 +10,6 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { paymentsAPI, subscriptionsAPI } from "@/lib/api";
 
-// Prevent prerendering since this page uses useSearchParams()
-export const dynamic = "force-dynamic";
-
 /* ─── Pricing Data ──────────────────────────────────────────────────── */
 const PLANS = [
   {

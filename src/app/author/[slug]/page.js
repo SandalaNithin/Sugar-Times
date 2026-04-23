@@ -3,11 +3,12 @@ import NewsCard from "@/components/NewsCard";
 import { ChevronRight } from "lucide-react";
 import { FacebookIcon, InstagramIcon, LinkedInIcon, MailIcon, TwitterXIcon, WhatsAppIcon, YouTubeIcon } from "@/components/SocialIcons";
 
-export const dynamic = "force-dynamic";
+const slugify = (s) =>
+  (s || "").toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 
 async function safeFetch(url) {
   try {
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url);
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -15,10 +16,22 @@ async function safeFetch(url) {
   }
 }
 
+export async function generateStaticParams() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const data = await safeFetch(`${apiUrl}/articles?limit=1000`);
+  const all = Array.isArray(data?.articles) ? data.articles : Array.isArray(data) ? data : [];
+  const slugs = new Set();
+  for (const a of all) {
+    const name = a.contributorName?.trim() || a.author || "";
+    if (name) slugs.add(slugify(name));
+  }
+  return [...slugs].map((slug) => ({ slug }));
+}
+
 // Fetch articles whose contributorName (slugified) matches the route slug. The
 // query string carries the canonical name/bio used on the article page so we
 // render a consistent header even when the API list is empty.
-async function getAuthorData(slug, searchName) {
+async function getAuthorData(slug) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
   const listData = await safeFetch(`${apiUrl}/articles?limit=100`);
   const all = Array.isArray(listData?.articles)
@@ -26,9 +39,6 @@ async function getAuthorData(slug, searchName) {
     : Array.isArray(listData)
       ? listData
       : [];
-
-  const slugify = (s) =>
-    (s || "").toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 
   const matchingArticles = all.filter((a) => {
     const name = a.contributorName?.trim() || a.author || "";
@@ -38,7 +48,6 @@ async function getAuthorData(slug, searchName) {
   const resolvedName =
     matchingArticles[0]?.contributorName?.trim() ||
     matchingArticles[0]?.author ||
-    searchName ||
     slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
   const resolvedBio = matchingArticles[0]?.contributorBio?.trim() || "";
@@ -52,15 +61,12 @@ export async function generateMetadata({ params }) {
   return { title: `${display} – Sugar Times` };
 }
 
-export default async function AuthorPage({ params, searchParams }) {
+export default async function AuthorPage({ params }) {
   const { slug } = await params;
-  const sp = (await searchParams) || {};
-  const fallbackName = typeof sp.name === "string" ? sp.name : "";
-  const fallbackBio = typeof sp.bio === "string" ? sp.bio : "";
 
-  const { name, bio, articles } = await getAuthorData(slug, fallbackName);
-  const displayName = name || fallbackName || "Contributor";
-  const displayBio = bio || fallbackBio;
+  const { name, bio, articles } = await getAuthorData(slug);
+  const displayName = name || "Contributor";
+  const displayBio = bio;
   const initial = (displayName.charAt(0) || "S").toUpperCase();
 
   return (

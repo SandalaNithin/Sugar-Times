@@ -10,7 +10,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 async function fetchJSON(url) {
   try {
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url);
     return res.ok ? await res.json() : null;
   } catch {
     return null;

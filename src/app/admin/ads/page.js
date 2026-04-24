@@ -25,7 +25,6 @@ const EMPTY_FORM = {
   link: "",
   placement: "middle",
   categories: [],
-  priority: 0,
   active: true,
   startDate: "",
   endDate: "",
@@ -63,7 +62,6 @@ export default function AdminAdsPage() {
       link: ad.link || "",
       placement: ad.placement || "middle",
       categories: ad.categories || [],
-      priority: ad.priority || 0,
       active: ad.active !== false,
       startDate: ad.startDate ? ad.startDate.slice(0, 10) : "",
       endDate: ad.endDate ? ad.endDate.slice(0, 10) : "",
@@ -145,7 +143,6 @@ export default function AdminAdsPage() {
                 link: item["Link"] || "",
                 placement: item["Placement"] || "middle",
                 categories: item["Categories"] ? item["Categories"].split(", ") : [],
-                priority: parseInt(item["Priority"]) || 0,
                 active: item["Active"] === "Yes",
                 startDate: item["Start Date"] || "",
                 endDate: item["End Date"] || "",
@@ -168,7 +165,6 @@ export default function AdminAdsPage() {
       "Link": ad.link || "",
       "Placement": ad.placement || "middle",
       "Categories": ad.categories?.length ? ad.categories.join(", ") : "",
-      "Priority": ad.priority || 0,
       "Active": ad.active ? "Yes" : "No",
       "Start Date": ad.startDate ? ad.startDate.slice(0, 10) : "",
       "End Date": ad.endDate ? ad.endDate.slice(0, 10) : "",
@@ -413,8 +409,8 @@ export default function AdminAdsPage() {
                 </div>
               </div>
 
-              {/* Schedule + Priority + Active */}
-              <div className="grid md:grid-cols-3 gap-5">
+              {/* Schedule + Active */}
+              <div className="grid md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">
                     <Calendar size={11} /> Start Date
@@ -434,15 +430,6 @@ export default function AdminAdsPage() {
                     type="date"
                     value={form.endDate}
                     onChange={(e) => setForm({ ...form, endDate: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-slate-100 rounded-xl text-sm font-bold focus:outline-none focus:border-green-500 bg-slate-50/50"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Priority</label>
-                  <input
-                    type="number"
-                    value={form.priority}
-                    onChange={(e) => setForm({ ...form, priority: Number(e.target.value) })}
                     className="w-full px-4 py-3 border-2 border-slate-100 rounded-xl text-sm font-bold focus:outline-none focus:border-green-500 bg-slate-50/50"
                   />
                 </div>

@@ -6,9 +6,7 @@ import { CATEGORY_TREE } from "@/lib/categories";
 /* ═══════════════════════════════════════════════════════════════════════════
    DATA FETCHING — Server-side, always fresh
    ═══════════════════════════════════════════════════════════════════════════ */
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://st-be-kh3k.onrender.com";
-
-export const revalidate = 60;
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 async function fetchJSON(url) {
   try {
@@ -48,7 +46,7 @@ async function getHomeData() {
     fetchJSON(`${API_URL}/categories`),
     fetchJSON(`${API_URL}/magazines`),
     fetchJSON(`${API_URL}/markets`),
-    fetchJSON(`${API_URL}/advertisements`),
+    fetchJSON(`${API_URL}/advertisements?activeOnly=true`),
   ]);
 
   /* ── Categories ──────────────────────────────────────────────────── */

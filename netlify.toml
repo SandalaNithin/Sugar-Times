@@ -1,9 +1,7 @@
 [build]
   command = "npm run build"
+  publish = "out"
 
 [build.environment]
   NEXT_PUBLIC_API_URL = "https://st-be-kh3k.onrender.com"
   NODE_VERSION       = "20"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"

@@ -3,7 +3,6 @@ import { useState, useEffect, Suspense, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import AdminLayout from "@/components/AdminLayout";
 import { articlesAPI, categoriesAPI } from "@/lib/api";
-import { mockArticles } from "@/lib/mockData";
 import Link from "next/link";
 import { Plus, Edit, Trash2, Eye, Search, Loader2, X, Save, TrendingUp, FileText, LayoutGrid, FileEdit } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
@@ -65,6 +64,9 @@ function ArticlesContent() {
     contributorBio: "",
     status: "published",
   });
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [limit, setLimit] = useState(20);
   const [saving, setSaving] = useState(false);
   const [isDrafting, setIsDrafting] = useState(false);
   const [showMedia, setShowMedia] = useState(false);
@@ -92,9 +94,13 @@ function ArticlesContent() {
   // Re-fetch whenever the sidebar category (or trending flag) changes so
   // the list for the selected category / sub-category actually populates.
   useEffect(() => {
+    setPage(1);
+  }, [urlCategory, urlTrending]);
+
+  useEffect(() => {
     fetchArticles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [urlCategory, urlTrending]);
+  }, [urlCategory, urlTrending, page, limit]);
 
   useEffect(() => {
     if (urlEditParam && articles.length > 0) {
@@ -140,7 +146,7 @@ function ArticlesContent() {
   const fetchArticles = async () => {
     setLoading(true);
     try {
-      const params = { limit: 100, admin: "true" };
+      const params = { page, limit, admin: "true" };
       if (urlCategory) params.category = urlCategory;
       const { data } = await articlesAPI.getAll(params);
       const list = Array.isArray(data?.articles)
@@ -149,14 +155,9 @@ function ArticlesContent() {
           ? data
           : [];
       setArticles(list);
+      setTotal(data.total || list.length);
     } catch {
-      // Fallback to mock data, client-filtered by URL category
-      const filteredMock = urlCategory
-        ? mockArticles.filter(
-            (a) => a.category === urlCategory || a.subcategory === urlCategory
-          )
-        : mockArticles;
-      setArticles(filteredMock);
+      setArticles([]);
     } finally {
       setLoading(false);
     }
@@ -504,13 +505,28 @@ function ArticlesContent() {
             <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search articles..."
               className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-400" />
           </div>
-          <DataExportImport
-            title="Articles"
-            data={filtered}
-            exportMapping={exportMapping}
-            onImport={handleImport}
-            isLoading={loading}
-          />
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Show</span>
+              <select 
+                value={limit} 
+                onChange={(e) => { setLimit(Number(e.target.value)); setPage(1); }}
+                className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-green-400 bg-white"
+              >
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+                <option value={200}>200</option>
+              </select>
+            </div>
+            <DataExportImport
+              title="Articles"
+              data={filtered}
+              exportMapping={exportMapping}
+              onImport={handleImport}
+              isLoading={loading}
+            />
+          </div>
         </div>
         {loading ? (
           <div className="flex items-center justify-center py-16"><Loader2 size={28} className="animate-spin text-green-500" /></div>
@@ -573,6 +589,89 @@ function ArticlesContent() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {!loading && total > 0 && (
+          <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/30">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+              Showing {(page - 1) * limit + 1} to {Math.min(page * limit, total)} of {total} entries
+            </p>
+            <div className="flex gap-2">
+              <button
+                disabled={page === 1}
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                className="px-4 py-2 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-green-400 disabled:opacity-30 disabled:hover:border-slate-200 transition-all bg-white"
+              >
+                Previous
+              </button>
+              
+              <div className="flex gap-1">
+                {(() => {
+                  const totalPages = Math.ceil(total / limit);
+                  const pages = [];
+                  
+                  // Helper to add a page button
+                  const addPage = (p) => {
+                    pages.push(
+                      <button
+                        key={p}
+                        onClick={() => setPage(p)}
+                        className={`w-8 h-8 rounded-lg text-[10px] font-black transition-all ${
+                          page === p ? "bg-green-600 text-white shadow-lg shadow-green-900/20" : "bg-white border border-slate-200 text-slate-400 hover:border-green-400"
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    );
+                  };
+
+                  // Helper to add ellipsis
+                  const addEllipsis = (key) => {
+                    pages.push(<span key={key} className="w-8 h-8 flex items-center justify-center text-slate-400 font-bold">...</span>);
+                  };
+
+                  if (totalPages <= 7) {
+                    for (let i = 1; i <= totalPages; i++) addPage(i);
+                  } else {
+                    // Always show page 1
+                    addPage(1);
+
+                    if (page > 3) addEllipsis("start-ellipsis");
+
+                    // Show range around current page
+                    const start = Math.max(2, page - 1);
+                    const end = Math.min(totalPages - 1, page + 1);
+                    
+                    // Adjust start/end to always show 3 pages in middle if possible
+                    let adjustedStart = start;
+                    let adjustedEnd = end;
+                    if (page <= 3) adjustedEnd = 4;
+                    if (page >= totalPages - 2) adjustedStart = totalPages - 3;
+
+                    for (let i = adjustedStart; i <= adjustedEnd; i++) {
+                      if (i > 1 && i < totalPages) addPage(i);
+                    }
+
+                    if (page < totalPages - 2) addEllipsis("end-ellipsis");
+
+                    // Always show last page
+                    addPage(totalPages);
+                  }
+
+                  return pages;
+                })()}
+              </div>
+
+              <button
+                disabled={page >= Math.ceil(total / limit)}
+                onClick={() => setPage(p => p + 1)}
+                className="px-4 py-2 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-green-400 disabled:opacity-30 disabled:hover:border-slate-200 transition-all bg-white"
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>

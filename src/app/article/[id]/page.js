@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Lock, ChevronRight, ChevronLeft, ArrowRight } from "lucide-react";
 import { FacebookIcon, InstagramIcon, LinkedInIcon, MailIcon, TwitterXIcon, WhatsAppIcon, YouTubeIcon } from "@/components/SocialIcons";
 import { notFound } from "next/navigation";
-import { mockArticles } from "@/lib/mockData";
 import ArticleShareBar from "@/components/article/ArticleShareBar";
 import ArticleSidebar from "@/components/article/ArticleSidebar";
 import ArticleInlineAd from "@/components/article/ArticleInlineAd";
@@ -42,35 +41,39 @@ async function getArticleData(id) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
   let article = await safeFetch(`${apiUrl}/articles/${id}`);
-  if (!article) {
-    article = mockArticles.find((a) =>
-      (a.id && a.id.toString() === id.toString()) ||
-      (a._id && a._id.toString() === id.toString())
-    );
-  }
   if (!article) return null;
 
-  const allData = await safeFetch(`${apiUrl}/articles?limit=20`);
-  const allArticles = Array.isArray(allData?.articles)
-    ? allData.articles
-    : Array.isArray(allData)
-      ? allData
-      : mockArticles;
-
   const currentId = (article._id || article.id)?.toString();
-  const others = allArticles.filter((a) => (a._id || a.id)?.toString() !== currentId);
-  const sameCategory = others.filter(
-    (a) => a.category === article.category || a.subcategory === article.category
-  );
-  const related = (sameCategory.length >= 3 ? sameCategory : others).slice(0, 3);
-  const popular = others.slice(0, 12);
 
+  // Fetch articles from the SAME category for Related Intelligence
+  const categoryParam = encodeURIComponent(article.category || "");
+  const relatedData = await safeFetch(`${apiUrl}/articles?limit=4&category=${categoryParam}`);
+  const relatedList = Array.isArray(relatedData?.articles) ? relatedData.articles : Array.isArray(relatedData) ? relatedData : [];
+  
+  // Filter out current article and take 3
+  const related = relatedList
+    .filter((a) => (a._id || a.id)?.toString() !== currentId)
+    .slice(0, 3);
+
+  // If we still have fewer than 3, fetch some latest articles as fallback
+  if (related.length < 3) {
+    const fallbackData = await safeFetch(`${apiUrl}/articles?limit=10`);
+    const fallbackList = Array.isArray(fallbackData?.articles) ? fallbackData.articles : Array.isArray(fallbackData) ? fallbackData : [];
+    const extras = fallbackList
+      .filter((a) => (a._id || a.id)?.toString() !== currentId && !related.some(r => (r._id || r.id) === (a._id || a.id)))
+      .slice(0, 3 - related.length);
+    related.push(...extras);
+  }
+
+  // For pagination (Prev/Next), we still use the latest list for now or just skip it if not reliable
+  const allData = await safeFetch(`${apiUrl}/articles?limit=20`);
+  const allArticles = Array.isArray(allData?.articles) ? allData.articles : Array.isArray(allData) ? allData : [];
   const idx = allArticles.findIndex((a) => (a._id || a.id)?.toString() === currentId);
   const prev = idx > 0 ? allArticles[idx - 1] : null;
   const next = idx >= 0 && idx < allArticles.length - 1 ? allArticles[idx + 1] : null;
+  const popular = allArticles.filter((a) => (a._id || a.id)?.toString() !== currentId).slice(0, 12);
 
   // Ads targeted at this article's category (or global)
-  const categoryParam = encodeURIComponent(article.category || "");
   const adsData = await safeFetch(
     `${apiUrl}/advertisements?activeOnly=true&category=${categoryParam}`
   );

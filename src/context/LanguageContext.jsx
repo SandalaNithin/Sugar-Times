@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 // Category labels come from the API in English. Translating them on render is
 // the cheapest fix; keys are normalised (lowercase, trimmed, ampersand and
@@ -181,12 +181,14 @@ const setGoogTransCookie = (value) => {
 };
 
 export function LanguageProvider({ children }) {
-  const [lang, setLangState] = useState("en");
+  const [lang, setLangState] = useState(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("lang");
+      if (stored === "hi" || stored === "en") return stored;
+    }
+    return "en";
+  });
 
-  useEffect(() => {
-    const stored = typeof window !== "undefined" ? localStorage.getItem("lang") : null;
-    if (stored === "hi" || stored === "en") setLangState(stored);
-  }, []);
 
   const setLang = (next) => {
     setLangState(next);

@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import { magazinesAPI } from "@/lib/api";
-import { mockMagazines } from "@/lib/mockData";
 import { Lock, Download, Eye, X, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
@@ -22,7 +21,7 @@ export default function MagazinesPage() {
       const { data } = await magazinesAPI.getAll();
       setMagazines(Array.isArray(data) ? data : []);
     } catch {
-      setMagazines(mockMagazines);
+      setMagazines([]);
     } finally {
       setLoading(false);
     }

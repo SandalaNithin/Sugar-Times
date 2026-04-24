@@ -39,7 +39,14 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [tickerArticles, setTickerArticles] = useState([]);
-  const [today, setToday] = useState("");
+  const [today] = useState(() =>
+    new Date().toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  );
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [renewalBadge, setRenewalBadge] = useState(null);
   const [navLinks, setNavLinks] = useState([
@@ -61,13 +68,6 @@ export default function Navbar() {
   };
 
   useEffect(() => {
-    setToday(new Date().toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }));
-
     // Fetch dynamic categories from API
     const fetchCategories = async () => {
       try {

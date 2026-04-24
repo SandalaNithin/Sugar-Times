@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 const FacebookIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -30,13 +30,15 @@ const LinkedInIcon = () => (
 );
 
 export default function ArticleShareBar({ url, title, showLabel = true }) {
-  // Prefer the live browser URL so the share targets always open
-  // the actual page the user is on — fixes sharing "localhost" or
-  // stale SSR-provided URLs in production.
+  // Use the server-provided URL initially to avoid hydration mismatch,
+  // then update to window.location.href once mounted on the client.
   const [liveUrl, setLiveUrl] = useState(url || "");
+
   useEffect(() => {
-    if (typeof window !== "undefined") setLiveUrl(window.location.href);
-  }, []);
+    if (typeof window !== "undefined") {
+      setLiveUrl(window.location.href);
+    }
+  }, [url]);
 
   const shareTitle = encodeURIComponent(title || "");
   const shareUrl = encodeURIComponent(liveUrl);

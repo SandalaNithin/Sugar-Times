@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import AdminLayout from "@/components/AdminLayout";
 import { adminAPI, articlesAPI } from "@/lib/api";
 import { unwrapList } from "@/lib/unwrapList";
-import { mockAdminStats, mockArticles } from "@/lib/mockData";
 import {
   Users,
   CreditCard,
@@ -67,13 +66,13 @@ export default function AdminDashboard() {
       if (!isMountedRef.current) return;
 
       setStats(
-        statsRes.status === "fulfilled" ? statsRes.value.data : mockAdminStats
+        statsRes.status === "fulfilled" ? statsRes.value.data : null
       );
       setUsers(usersRes.status === "fulfilled" ? unwrapList(usersRes.value.data) : []);
       setArticles(
         articlesRes.status === "fulfilled"
           ? unwrapList(articlesRes.value.data)
-          : mockArticles.slice(0, 5)
+          : []
       );
       setRevenueData(
         revenueRes.status === "fulfilled" ? revenueRes.value.data : []
@@ -81,8 +80,8 @@ export default function AdminDashboard() {
       setLoading(false);
     } catch (err) {
       if (isMountedRef.current) {
-        setStats(mockAdminStats);
-        setArticles(mockArticles.slice(0, 5));
+        setStats(null);
+        setArticles([]);
         setLoading(false);
       }
     }
@@ -112,7 +111,7 @@ export default function AdminDashboard() {
     );
   }
 
-  const s = stats || mockAdminStats;
+  const s = stats || {};
   const totalRevenueRupees = (s.totalRevenue || s.revenue || 0) / 100;
 
   const formatRevenue = (val) => {

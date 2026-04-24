@@ -1,7 +1,6 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { mockMagazines } from "@/lib/mockData";
 import TeamPhotoCard from "./TeamPhotoCard";
 
 export const metadata = {
@@ -134,12 +133,7 @@ const PUB_DETAILS = [
 
 export default async function AboutPage() {
   const dbMagazines = await getMagazines();
-  const magazines =
-    dbMagazines.length > 0
-      ? dbMagazines.slice(0, 3)
-      : mockMagazines.slice(0, 3);
-  if (magazines.length < 3)
-    magazines.push(...mockMagazines.slice(0, 3 - magazines.length));
+  const magazines = dbMagazines.slice(0, 3);
 
   const getImgUrl = (url) => getImageUrl(url);
 

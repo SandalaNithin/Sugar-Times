@@ -1,0 +1,5 @@
+# Handling Next.js Static Export SPA Fallback on Netlify
+# This ensures that if a page is not pre-rendered, Netlify doesn't show a 404
+# and instead serves the home page where the client-side router can take over.
+
+/*  /index.html  200

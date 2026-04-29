@@ -9,16 +9,31 @@ import ArticleInlineAd from "@/components/article/ArticleInlineAd";
 import ArticleCommentForm from "@/components/article/ArticleCommentForm";
 
 export async function generateStaticParams() {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-  try {
-    const res = await fetch(`${apiUrl}/articles?limit=1000`);
-    if (!res.ok) return [];
-    const data = await res.json();
-    const list = Array.isArray(data?.articles) ? data.articles : Array.isArray(data) ? data : [];
-    return list.map((a) => ({ id: (a._id || a.id).toString() }));
-  } catch {
-    return [];
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://st-be-kh3k.onrender.com";
+  
+  // Retry mechanism for OnRender free tier (wakes up sleepy servers)
+  let attempts = 0;
+  while (attempts < 3) {
+    try {
+      console.log(`[Build] Fetching articles for static params (Attempt ${attempts + 1})...`);
+      const res = await fetch(`${apiUrl}/articles?limit=10000`, { 
+        next: { revalidate: 3600 } 
+      });
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const data = await res.json();
+      const list = Array.isArray(data?.articles) ? data.articles : Array.isArray(data) ? data : [];
+      console.log(`[Build] Successfully pre-rendering ${list.length} articles.`);
+      return list.map((a) => ({ id: (a._id || a.id).toString() }));
+    } catch (err) {
+      attempts++;
+      console.error(`[Build] Attempt ${attempts} failed: ${err.message}`);
+      if (attempts < 3) {
+        console.log("[Build] Retrying in 5 seconds...");
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
+    }
   }
+  return [];
 }
 
 const getImageUrl = (url) => {

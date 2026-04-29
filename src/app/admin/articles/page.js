@@ -384,7 +384,7 @@ function ArticlesContent() {
                        <input type="checkbox" className="hidden" checked={form.premium} onChange={(e) => setForm({ ...form, premium: e.target.checked })} />
                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-md ${form.premium ? "left-5" : "left-1"}`}></div>
                     </div>
-                    <span className="text-xs font-black text-slate-700 uppercase tracking-widest group-hover:text-slate-900">Premium Content</span>
+                    <span className="text-xs font-black text-slate-700 uppercase tracking-widest group-hover:text-slate-900">Print Content</span>
                   </label>
 
                   <label className="flex items-center gap-3 cursor-pointer group">
@@ -565,7 +565,7 @@ function ArticlesContent() {
                           {a.status === "draft" ? "DRAFT" : "PUBLISHED"}
                         </span>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full w-max ${a.premium ? "bg-slate-900 text-green-400" : "bg-green-100 text-green-700"}`}>
-                          {a.premium ? "Premium" : "Free"}
+                          {a.premium ? "Print" : "Free"}
                         </span>
                         {a.trending && <span className="text-[10px] font-bold text-red-600 uppercase flex items-center gap-1"><TrendingUp size={10} /> Breaking</span>}
                       </div>

@@ -2,11 +2,12 @@ import Link from "next/link";
 import PricingCards from "@/components/PricingCards";
 import { ArrowRight, TrendingUp, TrendingDown, Minus, ChevronRight, BarChart2 } from "lucide-react";
 import { CATEGORY_TREE } from "@/lib/categories";
+import Advertisement from "@/components/Advertisement";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    DATA FETCHING — Server-side, always fresh
    ═══════════════════════════════════════════════════════════════════════════ */
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://st-be-kh3k.onrender.com";
 
 async function fetchJSON(url) {
   try {
@@ -435,17 +436,10 @@ export default async function HomePage() {
                     </div>
                   )}
 
-                  {/* Home Banner Ad — Injected after the Technology section (smaller size) */}
-                  {section.name === "Technology" && homeBannerAd && (
-                    <div className="my-14 text-center">
-                      <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black mb-2">Advertisement</p>
-                      <a href={homeBannerAd.link || "#"} target="_blank" rel="noopener noreferrer" className="block mx-auto overflow-hidden group max-w-5xl border border-slate-100 rounded-xl bg-white">
-                        <img
-                          src={img(homeBannerAd.image)}
-                          alt={homeBannerAd.title || "Advertisement"}
-                          className="w-full h-24 lg:h-32 object-contain group-hover:scale-[1.02] transition-transform duration-500"
-                        />
-                      </a>
+                  {/* Home Banner Ad — Injected after the Technology section */}
+                  {section.name === "Technology" && (
+                    <div className="my-14">
+                      <Advertisement ad={homeBannerAd} placement="banner" className="max-w-5xl mx-auto" />
                     </div>
                   )}
 
@@ -601,20 +595,7 @@ export default async function HomePage() {
             )}
 
             {/* Advertisement */}
-            {sidebarAd ? (
-              <a href={sidebarAd.link || "#"} target="_blank" rel="noopener noreferrer" className="block bg-slate-100 border border-slate-200 rounded-xl relative group overflow-hidden">
-                <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest absolute top-2 right-2 border border-slate-200 bg-white px-2 py-0.5 rounded-sm z-10">Ad</span>
-                <img src={img(sidebarAd.image)} alt={sidebarAd.title} className="w-full h-auto object-cover" />
-              </a>
-            ) : (
-              <div className="bg-slate-100 border border-slate-200 h-[250px] flex items-center justify-center relative rounded-xl">
-                <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest absolute top-2 right-2 border border-slate-200 bg-white px-2 py-0.5 rounded-sm">Ad</span>
-                <div className="text-slate-300 text-center">
-                  <span className="block text-3xl mb-1 font-black">300x250</span>
-                  <span className="block text-xs uppercase tracking-widest font-bold">Ad Space</span>
-                </div>
-              </div>
-            )}
+            <Advertisement ad={sidebarAd} placement="sidebar" />
           </aside>
         </div>
 

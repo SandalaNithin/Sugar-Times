@@ -9,7 +9,7 @@ const getImageUrl = (url) => {
   return `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}${url}`;
 };
 
-export default function ArticleSidebar({ popular = [], ads = [] }) {
+export default function ArticleSidebar({ popular = [], ads = [], category = "" }) {
   const [expanded, setExpanded] = useState(false);
   const initialCount = 5;
   const visible = expanded ? popular : popular.slice(0, initialCount);
@@ -27,8 +27,14 @@ export default function ArticleSidebar({ popular = [], ads = [] }) {
           <div className="w-6 h-6 bg-orange-500 rounded-lg flex items-center justify-center">
             <Flame className="w-3.5 h-3.5 text-white" />
           </div>
-          <h3 className="text-white text-[11px] font-black uppercase tracking-[0.2em]">The Most Popular</h3>
+          <div className="flex flex-col">
+            <h3 className="text-white text-[11px] font-black uppercase tracking-[0.2em]">Most Popular</h3>
+            {category && (
+              <span className="text-orange-300 text-[9px] font-bold uppercase tracking-widest mt-0.5">{category}</span>
+            )}
+          </div>
         </div>
+
 
         <div className="divide-y divide-slate-100">
           {popular.length === 0 && (

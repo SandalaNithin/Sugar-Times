@@ -65,13 +65,19 @@ async function getArticleData(id) {
     related.push(...extras);
   }
 
-  // For pagination (Prev/Next), we still use the latest list for now or just skip it if not reliable
+  // Fetch more category articles for the sidebar "Most Popular" section
+  const popularData = await safeFetch(`${apiUrl}/articles?limit=12&category=${categoryParam}`);
+  const popularList = Array.isArray(popularData?.articles) ? popularData.articles : Array.isArray(popularData) ? popularData : [];
+  const popular = popularList
+    .filter((a) => (a._id || a.id)?.toString() !== currentId)
+    .slice(0, 12);
+
+  // For Prev / Next navigation use the latest 20 articles
   const allData = await safeFetch(`${apiUrl}/articles?limit=20`);
   const allArticles = Array.isArray(allData?.articles) ? allData.articles : Array.isArray(allData) ? allData : [];
   const idx = allArticles.findIndex((a) => (a._id || a.id)?.toString() === currentId);
   const prev = idx > 0 ? allArticles[idx - 1] : null;
   const next = idx >= 0 && idx < allArticles.length - 1 ? allArticles[idx + 1] : null;
-  const popular = allArticles.filter((a) => (a._id || a.id)?.toString() !== currentId).slice(0, 12);
 
   // Ads targeted at this article's category (or global)
   const adsData = await safeFetch(
@@ -320,7 +326,7 @@ export default async function ArticlePage({ params }) {
 
           {/* Sidebar — fixed rail on desktop, stacks on mobile */}
           <div className="w-full lg:w-[320px] lg:flex-shrink-0 order-2 lg:sticky lg:top-24 self-start">
-            <ArticleSidebar popular={popular} ads={sidebarAds} />
+            <ArticleSidebar popular={popular} ads={sidebarAds} category={article.category} />
           </div>
         </div>
       </div>

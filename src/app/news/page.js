@@ -3,10 +3,12 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import NewsCard from "@/components/NewsCard";
-import { articlesAPI, categoriesAPI } from "@/lib/api";
-import { Search, Loader2, ChevronRight } from "lucide-react";
+import { articlesAPI, categoriesAPI, adsAPI } from "@/lib/api";
+import { Search, Loader2, TrendingUp, Flame } from "lucide-react";
 import { CATEGORY_TREE } from "@/lib/categories";
 import { useLang } from "@/context/LanguageContext";
+import { useAuth } from "@/context/AuthContext";
+import Advertisement from "@/components/Advertisement";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -25,6 +27,7 @@ const ARTICLES_PER_PAGE = 12;
 
 function NewsContent() {
   const { t, tCategory } = useLang();
+  const { isAdmin } = useAuth();
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category") || "All";
   const initialSearch = searchParams.get("search") || "";
@@ -36,6 +39,9 @@ function NewsContent() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [categoryList, setCategoryList] = useState(staticCategories);
+  const [trendingArticles, setTrendingArticles] = useState([]);
+  const [sidebarAd, setSidebarAd] = useState(null);
+  const [topAd, setTopAd] = useState(null);
 
   // Fetch dynamic categories from API
   useEffect(() => {
@@ -84,6 +90,41 @@ function NewsContent() {
       setLoading(false);
     }
   };
+
+  // Fetch category-specific trending articles and ads for sidebar
+  useEffect(() => {
+    const fetchSidebar = async () => {
+      try {
+        const params = { limit: 6, trending: true };
+        if (category !== "All") params.category = category;
+        const { data } = await articlesAPI.getAll(params);
+        const list = Array.isArray(data?.articles) ? data.articles : Array.isArray(data) ? data : [];
+        // If no trending in category, fall back to latest in category
+        if (list.length === 0 && category !== "All") {
+          const fb = await articlesAPI.getAll({ limit: 6, category });
+          const fbList = Array.isArray(fb.data?.articles) ? fb.data.articles : Array.isArray(fb.data) ? fb.data : [];
+          setTrendingArticles(fbList);
+        } else {
+          setTrendingArticles(list);
+        }
+      } catch { setTrendingArticles([]); }
+
+      try {
+        const catParam = category !== "All" ? category : "";
+        const res = await adsAPI.getAll({ activeOnly: true, category: catParam, placement: "sidebar" });
+        const adList = Array.isArray(res.data) ? res.data : [];
+        setSidebarAd(adList[0] || null);
+
+        const topRes = await adsAPI.getAll({ activeOnly: true, category: catParam, placement: "news_top" });
+        const topList = Array.isArray(topRes.data) ? topRes.data : [];
+        setTopAd(topList[0] || null);
+      } catch { 
+        setSidebarAd(null);
+        setTopAd(null);
+      }
+    };
+    fetchSidebar();
+  }, [category]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -249,8 +290,15 @@ function NewsContent() {
         </div>
 
         <div className="flex gap-8">
-          {/* Articles grid */}
-          <div className="flex-1">
+          {/* Left Content Area */}
+          <div className="flex-1 min-w-0">
+            
+            {/* News Top Ad Placement */}
+            <div className="mb-8">
+              <Advertisement ad={topAd} placement="banner" className="w-full" />
+            </div>
+
+            {/* Articles grid */}
             {loading ? (
               <div className="flex items-center justify-center py-20">
                 <Loader2 size={32} className="animate-spin text-green-500" />
@@ -306,34 +354,44 @@ function NewsContent() {
           </div>
 
           {/* Sidebar */}
-          <aside className="hidden lg:block w-72 shrink-0 space-y-6">
-            <div className="bg-white rounded-2xl border border-slate-100 p-5">
-              <h3 className="font-bold text-slate-800 mb-4">{t("trending_topics")}</h3>
-              <ul className="space-y-2">
-                {[
-                  { query: "Ethanol Blending", key: "trend_ethanol_blending" },
-                  { query: "FRP 2026-27", key: "trend_frp" },
-                  { query: "Sugar Export", key: "trend_sugar_export" },
-                  { query: "Maharashtra Mills", key: "trend_mh_mills" },
-                  { query: "Cane Prices", key: "trend_cane_prices" },
-                  { query: "ISMA Report", key: "trend_isma" },
-                ].map((trend) => (
-                  <li
-                    key={trend.key}
-                    onClick={() => { setSearch(trend.query); setPage(1); }}
-                    className="flex items-center gap-2 text-sm text-slate-600 hover:text-green-600 cursor-pointer transition-colors"
-                  >
-                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />{t(trend.key)}
+          <aside className="hidden lg:block w-72 shrink-0 space-y-5">
+
+            {/* Category Trending Topics */}
+            <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
+              <div className="px-5 py-3.5 bg-slate-900 flex items-center gap-2.5">
+                <div className="w-5 h-5 bg-red-500 rounded-md flex items-center justify-center">
+                  <Flame className="w-3 h-3 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-white text-[11px] font-black uppercase tracking-[0.18em]">Trending Topics</h3>
+                  {category !== "All" && (
+                    <span className="text-red-300 text-[9px] font-bold uppercase tracking-widest">{tCategory(category)}</span>
+                  )}
+                </div>
+              </div>
+              <ul className="divide-y divide-slate-50">
+                {trendingArticles.length === 0 ? (
+                  <li className="px-5 py-8 text-xs text-slate-400 italic text-center">Loading trends...</li>
+                ) : trendingArticles.map((a, idx) => (
+                  <li key={a._id || a.id}>
+                    <a href={`/article/${a._id || a.id}`}
+                      className="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 transition-colors group">
+                      <span className="text-[11px] font-black text-slate-300 group-hover:text-red-400 transition-colors w-4 shrink-0 mt-0.5">{idx + 1}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[12px] font-bold text-slate-700 group-hover:text-green-600 transition-colors leading-snug line-clamp-2">{a.title}</p>
+                        <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-wider mt-1 block">
+                          {tCategory(a.subcategory || a.category)}
+                        </span>
+                      </div>
+                      {a.trending && <TrendingUp size={11} className="text-red-400 shrink-0 mt-1" />}
+                    </a>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="bg-green-50 border border-green-100 rounded-2xl p-5">
-              <h3 className="font-bold text-slate-800 mb-2">{t("newsletter")}</h3>
-              <p className="text-sm text-slate-500 mb-3">{t("newsletter_desc")}</p>
-              <input type="email" placeholder={t("your_email")} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-green-400" />
-              <button className="w-full bg-green-500 text-white text-sm font-semibold py-2 rounded-lg hover:bg-green-600 transition-colors">{t("subscribe")}</button>
-            </div>
+
+            {/* Advertisement */}
+            <Advertisement ad={sidebarAd} placement="sidebar" />
           </aside>
         </div>
       </div>

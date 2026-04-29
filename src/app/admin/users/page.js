@@ -13,10 +13,9 @@ export default function AdminUsers() {
   const [stats, setStats] = useState(null);
 
   // Modals
-  const [addModal, setAddModal] = useState(false);
   const [editModal, setEditModal] = useState(null);
   const [deleteModal, setDeleteModal] = useState(null);
-  
+
   const [formData, setFormData] = useState({
     name: "", email: "", role: "user",
     // Subscription fields
@@ -44,9 +43,9 @@ export default function AdminUsers() {
         adminAPI.getUsers({ limit: 50 }),
         adminAPI.getStats()
       ]);
-      
+
       if (!isMountedRef.current) return;
-      
+
       setUsers(unwrapList(usersRes.data));
       setStats(statsRes.data);
     } catch (err) {
@@ -66,18 +65,12 @@ export default function AdminUsers() {
     u.email?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const openAddModal = () => {
-    setFormData({ name: "", email: "", role: "user" });
-    setFormError("");
-    setFormSuccess("");
-    setAddModal(true);
-  };
 
   const openEditModal = async (user) => {
     setFormLoading(true);
     setFormError("");
     setFormSuccess("");
-    
+
     // Default form with user basics
     let initialData = {
       name: user.name || "",
@@ -122,27 +115,6 @@ export default function AdminUsers() {
     }
   };
 
-  const handleAddUser = async () => {
-    setFormError("");
-    setFormSuccess("");
-
-    if (!formData.name.trim() || !formData.email.trim()) {
-      setFormError("Name and email are required");
-      return;
-    }
-
-    setFormLoading(true);
-    try {
-      await adminAPI.createUser(formData);
-      setFormSuccess("User created successfully!");
-      setAddModal(false);
-      setTimeout(() => fetchUsers(), 500);
-    } catch (err) {
-      setFormError(err.response?.data?.message || "Failed to create user");
-    } finally {
-      setFormLoading(false);
-    }
-  };
 
   const handleEditUser = async () => {
     setFormError("");
@@ -184,30 +156,30 @@ export default function AdminUsers() {
   const handleImport = async (parsedData, updateProgress) => {
     let successCount = 0;
     for (let i = 0; i < parsedData.length; i++) {
-        const item = parsedData[i];
-        try {
-            await adminAPI.createUser({
-                name: item["Name"] || "Unknown User",
-                email: item["Email"] || "",
-                role: item["Role"]?.toLowerCase() === "admin" ? "admin" : "user",
-            });
-            successCount++;
-        } catch (error) {
-            console.error("Failed to import user row:", i, error);
-        }
-        updateProgress(i + 1);
+      const item = parsedData[i];
+      try {
+        await adminAPI.createUser({
+          name: item["Name"] || "Unknown User",
+          email: item["Email"] || "",
+          role: item["Role"]?.toLowerCase() === "admin" ? "admin" : "user",
+        });
+        successCount++;
+      } catch (error) {
+        console.error("Failed to import user row:", i, error);
+      }
+      updateProgress(i + 1);
     }
     if (successCount > 0) fetchUsers();
     if (successCount < parsedData.length) {
-        throw new Error(`Imported ${successCount}/${parsedData.length} successfully.`);
+      throw new Error(`Imported ${successCount}/${parsedData.length} successfully.`);
     }
   };
 
   const exportMapping = (u) => ({
-      "Name": u.name || "",
-      "Email": u.email || "",
-      "Role": u.role === "admin" ? "Admin" : "User",
-      "Joined On": u.createdAt ? new Date(u.createdAt).toISOString().split("T")[0] : ""
+    "Name": u.name || "",
+    "Email": u.email || "",
+    "Role": u.role === "admin" ? "Admin" : "User",
+    "Joined On": u.createdAt ? new Date(u.createdAt).toISOString().split("T")[0] : ""
   });
 
   return (
@@ -225,17 +197,11 @@ export default function AdminUsers() {
             onImport={handleImport}
             isLoading={loading}
           />
-          <button 
+          <button
             onClick={fetchUsers}
             className="flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm"
           >
             <RefreshCw size={16} className={loading ? "animate-spin" : ""} /> Sync
-          </button>
-          <button 
-            onClick={openAddModal}
-            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm"
-          >
-            <Plus size={16} /> Add User
           </button>
         </div>
       </div>
@@ -302,16 +268,16 @@ export default function AdminUsers() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex justify-end gap-2">
-                        <button 
+                        <button
                           onClick={() => openEditModal(user)}
-                          className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all border border-transparent hover:border-blue-100" 
+                          className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all border border-transparent hover:border-blue-100"
                           title="Edit User"
                         >
                           <Edit size={16} />
                         </button>
-                        <button 
+                        <button
                           onClick={() => setDeleteModal(user)}
-                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all border border-transparent hover:border-red-100" 
+                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all border border-transparent hover:border-red-100"
                           title="Delete User"
                         >
                           <Trash2 size={16} />
@@ -325,22 +291,22 @@ export default function AdminUsers() {
           </div>
         )}
       </div>
-      {(addModal || editModal) && (
+      {editModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 overflow-y-auto">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-8">
             <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
               <div>
-                <h3 className="text-lg font-black text-slate-900">{editModal ? "Edit User & Subscription" : "Add New User"}</h3>
-                <p className="text-sm text-slate-500 mt-0.5">{editModal ? "Full profile and membership management" : "Create a new user account"}</p>
+                <h3 className="text-lg font-black text-slate-900">Edit User & Subscription</h3>
+                <p className="text-sm text-slate-500 mt-0.5">Full profile and membership management</p>
               </div>
-              <button 
-                onClick={() => { setAddModal(false); setEditModal(null); }}
+              <button
+                onClick={() => setEditModal(null)}
                 className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
               >
                 <X size={20} className="text-slate-400" />
               </button>
             </div>
-            
+
             <div className="px-6 py-5 overflow-y-auto max-h-[70vh] space-y-8">
               {formError && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex gap-3">
@@ -465,18 +431,18 @@ export default function AdminUsers() {
 
             <div className="px-6 py-4 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50 rounded-b-2xl">
               <button
-                onClick={() => { setAddModal(false); setEditModal(null); setFormError(""); setFormSuccess(""); }}
+                onClick={() => { setEditModal(null); setFormError(""); setFormSuccess(""); }}
                 className="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-xl transition-colors"
               >
                 Cancel
               </button>
               <button
-                onClick={editModal ? handleEditUser : handleAddUser}
+                onClick={handleEditUser}
                 disabled={formLoading}
                 className="px-6 py-2.5 text-sm font-black text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-xl transition-all shadow-md shadow-emerald-500/20 flex items-center gap-2"
               >
                 {formLoading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
-                {editModal ? "Save All Changes" : "Create User"}
+                Save All Changes
               </button>
             </div>
           </div>

@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import GoogleTranslate from "@/components/GoogleTranslate";
 import { AuthProvider } from "@/context/AuthContext";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { Toaster } from "react-hot-toast";
 
 export default function ClientLayout({ children }) {
   const pathname = usePathname();
@@ -16,6 +17,7 @@ export default function ClientLayout({ children }) {
   return (
     <LanguageProvider>
       <AuthProvider>
+        <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
         <GoogleTranslate />
         {!isTakeoverPage && <Navbar />}
         <main className={isTakeoverPage ? "min-h-screen grow flex flex-col" : "grow flex flex-col"}>

@@ -7,7 +7,7 @@ import Advertisement from "@/components/Advertisement";
 /* ═══════════════════════════════════════════════════════════════════════════
    DATA FETCHING — Server-side, always fresh
    ═══════════════════════════════════════════════════════════════════════════ */
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://st-be-kh3k.onrender.com";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 async function fetchJSON(url) {
   try {

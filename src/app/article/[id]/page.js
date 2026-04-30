@@ -9,15 +9,15 @@ import ArticleInlineAd from "@/components/article/ArticleInlineAd";
 import ArticleCommentForm from "@/components/article/ArticleCommentForm";
 
 export async function generateStaticParams() {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://st-be-kh3k.onrender.com";
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
   
-  // Retry mechanism for OnRender free tier (wakes up sleepy servers)
+  // Retry mechanism for API fetches
   let attempts = 0;
   while (attempts < 3) {
     try {
       console.log(`[Build] Fetching articles for static params (Attempt ${attempts + 1})...`);
       const res = await fetch(`${apiUrl}/articles?limit=10000`, { 
-        next: { revalidate: 3600 } 
+        cache: "no-store" 
       });
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();

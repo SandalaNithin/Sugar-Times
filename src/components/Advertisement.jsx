@@ -2,7 +2,7 @@
 import { useAuth } from "@/context/AuthContext";
 import { Plus, Megaphone } from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://st-be-kh3k.onrender.com";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 function img(url) {
   if (!url) return "";

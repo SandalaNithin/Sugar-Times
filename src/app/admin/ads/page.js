@@ -225,7 +225,7 @@ export default function AdminAdsPage() {
       const formData = new FormData();
       formData.append("file", file);
       const { data } = await mediaAPI.upload(formData);
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://st-be-kh3k.onrender.com";
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const url = data.url.startsWith("http") ? data.url : `${baseUrl}${data.url}`;
       setForm((prev) => ({ ...prev, image: url }));
       toast.success("Image uploaded successfully");

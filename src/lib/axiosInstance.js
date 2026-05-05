@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  typeof window === "undefined"
+    ? process.env.API_BASE_URL || "http://localhost:5000"  // server/build
+    : process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"; // browser
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,

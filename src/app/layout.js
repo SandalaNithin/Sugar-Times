@@ -19,6 +19,11 @@ export const metadata = {
   alternates: {
     canonical: "https://sugartimes.in", // Adjust to your actual domain
   },
+  icons: {
+    icon: "/ST Logo.png",
+    shortcut: "/ST Logo.png",
+    apple: "/ST Logo.png",
+  },
   // Google Publisher / News specific
   other: {
     "google-site-verification": "YOUR_VERIFICATION_CODE_HERE", // User should replace this

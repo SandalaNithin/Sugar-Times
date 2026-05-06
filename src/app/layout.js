@@ -17,7 +17,7 @@ export const metadata = {
     },
   },
   alternates: {
-    canonical: "https://sugartimes.in", // Adjust to your actual domain
+    canonical: "https://sugartimes.co.in/",
   },
   icons: {
     icon: "/ST Logo.png",

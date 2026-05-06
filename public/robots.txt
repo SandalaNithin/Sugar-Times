@@ -2,14 +2,14 @@ User-agent: *
 Allow: /
 
 # Disallow administrative and private areas
-Disallow: /admin
-Disallow: /dashboard
-Disallow: /login
-Disallow: /register
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /login/
+Disallow: /register/
 Disallow: /api/
 Disallow: /_next/
 Disallow: /static/
-Disallow: /test
+Disallow: /test/
 
 # Sitemap location
 Sitemap: https://sugartimes.co.in/sitemap.xml

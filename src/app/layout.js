@@ -24,9 +24,30 @@ export const metadata = {
     shortcut: "/ST Logo.png",
     apple: "/ST Logo.png",
   },
+  openGraph: {
+    title: "Sugar Times - Monthly News Magazine on Sugar and Biofuel industry",
+    description: "Sugar Times is a leading monthly magazine focusing on the sugar and biofuel industry since 2015.",
+    url: "https://sugartimes.co.in/",
+    siteName: "Sugar Times",
+    images: [
+      {
+        url: "https://sugartimes.co.in/ST Logo.png",
+        width: 800,
+        height: 800,
+      },
+    ],
+    locale: "en_IN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sugar Times - Monthly News Magazine",
+    description: "Focusing on the sugar and biofuel industry since 2015.",
+    images: ["https://sugartimes.co.in/ST Logo.png"],
+  },
   // Google Publisher / News specific
   other: {
-    "google-site-verification": "YOUR_VERIFICATION_CODE_HERE", // User should replace this
+    "google-site-verification": "YOUR_VERIFICATION_CODE_HERE",
     "news_keywords": "Sugar, Ethanol, Biofuel, Energy, Agriculture",
   }
 };

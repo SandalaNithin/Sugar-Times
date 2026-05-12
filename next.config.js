@@ -20,7 +20,7 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: "/category/sugar-sector/",
+        source: "/category/industryupdates/",
         destination: "/news/?category=Sugar%20Industry",
         permanent: true,
       },
@@ -37,6 +37,11 @@ const nextConfig = {
       {
         source: "/about-us/",
         destination: "/about/",
+        permanent: true,
+      },
+      {
+        source: "/category/technology/",
+        destination: "/news/?category=Technology",
         permanent: true,
       },
     ];

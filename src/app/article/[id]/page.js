@@ -15,20 +15,16 @@ export async function generateStaticParams() {
   let attempts = 0;
   while (attempts < 3) {
     try {
-      console.log(`[Build] Fetching articles for static params (Attempt ${attempts + 1})...`);
       const res = await fetch(`${apiUrl}/articles?limit=10000`, { 
         cache: "no-store" 
       });
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       const list = Array.isArray(data?.articles) ? data.articles : Array.isArray(data) ? data : [];
-      console.log(`[Build] Successfully pre-rendering ${list.length} articles.`);
       return list.map((a) => ({ id: (a._id || a.id).toString() }));
     } catch (err) {
       attempts++;
-      console.error(`[Build] Attempt ${attempts} failed: ${err.message}`);
       if (attempts < 3) {
-        console.log("[Build] Retrying in 5 seconds...");
         await new Promise(resolve => setTimeout(resolve, 5000));
       }
     }
@@ -44,7 +40,7 @@ const getImageUrl = (url) => {
 
 async function safeFetch(url) {
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -106,7 +102,41 @@ async function getArticleData(id) {
 export async function generateMetadata({ params }) {
   const { id } = await params;
   const data = await getArticleData(id);
-  return { title: data?.article ? `${data.article.title} – Sugar Times` : "Article – Sugar Times" };
+  const article = data?.article;
+
+  if (!article) return { title: "Article – Sugar Times" };
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sugartimes.co.in";
+  const title = `${article.title} – Sugar Times`;
+  const description = (article.excerpt || article.content || "").substring(0, 160).replace(/<[^>]*>/g, "").trim();
+  const imageUrl = getImageUrl(article.image);
+  const pageUrl = `${siteUrl}/article/${article._id || article.id}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: pageUrl,
+      siteName: "Sugar Times",
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+        },
+      ],
+      locale: "en_IN",
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [imageUrl],
+    },
+  };
 }
 
 export default async function ArticlePage({ params }) {
@@ -176,11 +206,11 @@ export default async function ArticlePage({ params }) {
                 )}
               </div>
 
-              <h1 className="text-[28px] sm:text-[32px] md:text-[40px] lg:text-[44px] font-black text-slate-900 leading-[1.1] mb-6 tracking-tight break-words">
+              <h1 className="text-[28px] sm:text-[32px] md:text-[40px] lg:text-[44px] font-black text-slate-900 leading-[1.1] mb-4 tracking-tight break-words">
                 {article.title}
               </h1>
 
-              <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-4 py-6 border-y border-slate-100 mb-8">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-4 py-4 border-y border-slate-100 mb-6">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-inner">
                     <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
@@ -188,10 +218,13 @@ export default async function ArticlePage({ params }) {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-[11px] text-slate-400 uppercase font-black tracking-widest leading-none mb-1.5">
-                      By <span className="text-slate-900">{article.author || "Sugar Times Team"}</span>
+                    <p className="text-[13px] text-slate-500 uppercase font-bold tracking-wider leading-none mb-2">
+                      By <span className="text-slate-900 font-black">
+                        {article.contributorName?.trim() || 
+                         (article.author && isNaN(article.author) ? article.author : "Sugar Times Team")}
+                      </span>
                     </p>
-                    <p className="text-xs font-bold text-slate-500">{dynamicDate}</p>
+                    <p className="text-[13px] font-bold text-slate-600">{dynamicDate}</p>
                   </div>
                 </div>
 
@@ -200,30 +233,26 @@ export default async function ArticlePage({ params }) {
             </header>
 
             {/* Cover */}
-            <figure className="mb-12 group relative">
-              <div className="overflow-hidden rounded-2xl bg-slate-100 shadow-2xl">
+            <figure className="mb-8 group relative">
+              <div className="overflow-hidden rounded-2xl bg-black/5 shadow-2xl flex items-center justify-center">
                 <img
                   src={getImageUrl(article.image)}
                   alt={article.title}
-                  className="w-full h-auto aspect-[16/9] object-cover group-hover:scale-105 transition-transform duration-1000 ease-out"
+                  className="w-full h-auto aspect-[16/9] object-contain group-hover:scale-105 transition-transform duration-1000 ease-out"
                 />
               </div>
-              <figcaption className="text-[11px] text-slate-400 mt-4 italic text-right font-medium px-2">
-                Source: Sugar Times
-              </figcaption>
             </figure>
 
             {/* Content */}
             <div className="prose prose-slate prose-base sm:prose-lg max-w-none break-words 
-              prose-headings:font-black prose-headings:text-slate-900 prose-headings:tracking-tight 
-              prose-p:text-slate-700 prose-p:leading-[1.8] prose-p:font-medium prose-p:mb-8
+              prose-headings:font-black prose-headings:text-slate-900 prose-headings:tracking-tight               prose-p:text-slate-700 prose-p:leading-[1.8] prose-p:font-medium prose-p:mb-4
               prose-a:text-emerald-600 prose-a:font-bold prose-a:no-underline hover:prose-a:underline 
               prose-img:rounded-2xl prose-img:shadow-lg prose-img:w-full prose-img:h-auto
               prose-blockquote:border-l-4 prose-blockquote:border-emerald-500 prose-blockquote:bg-emerald-50/30 prose-blockquote:px-6 prose-blockquote:py-2 prose-blockquote:rounded-r-xl prose-blockquote:italic
               prose-li:text-slate-700 prose-li:font-medium">
               {article.premium ? (
                 <div className="relative">
-                  <div className="opacity-40 select-none pointer-events-none" dangerouslySetInnerHTML={{ __html: (article.content || "").slice(0, 400) }} />
+                  <div className="opacity-40 select-none pointer-events-none article-content-body" dangerouslySetInnerHTML={{ __html: (article.content || "").slice(0, 400) }} />
                   <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent flex items-center justify-center pt-20">
                     <div className="bg-white border-2 border-emerald-500 rounded-3xl p-8 max-w-md text-center shadow-2xl translate-y-10">
                       <Lock size={32} className="text-emerald-500 mx-auto mb-4" />
@@ -287,9 +316,17 @@ export default async function ArticlePage({ params }) {
                 <div className="mt-12 p-8 rounded-lg border border-slate-200 bg-white">
                   <div className="flex items-start gap-6">
                     <Link href={authorHref} className="shrink-0">
-                      <div className="w-[120px] h-[120px] rounded-full bg-slate-200 flex items-center justify-center text-slate-400 font-black text-4xl overflow-hidden border border-slate-200 hover:ring-4 hover:ring-emerald-100 transition-all">
-                        {initial}
-                      </div>
+                      {article.contributorImage ? (
+                        <img 
+                          src={getImageUrl(article.contributorImage)} 
+                          alt={contributorName}
+                          className="w-[120px] h-[120px] rounded-full object-cover border border-slate-200 hover:ring-4 hover:ring-emerald-100 transition-all shadow-sm"
+                        />
+                      ) : (
+                        <div className="w-[120px] h-[120px] rounded-full bg-slate-200 flex items-center justify-center text-slate-400 font-black text-4xl overflow-hidden border border-slate-200 hover:ring-4 hover:ring-emerald-100 transition-all">
+                          {initial}
+                        </div>
+                      )}
                     </Link>
                     <div className="flex-1 min-w-0">
                       <Link href={authorHref} className="inline-block text-xl font-black text-slate-900 hover:text-emerald-600 transition-colors">

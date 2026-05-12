@@ -12,7 +12,8 @@ export default function ClientLayout({ children }) {
   const isTakeoverPage = pathname === "/about" || 
                          pathname?.startsWith("/login") || 
                          pathname?.startsWith("/register") || 
-                         pathname?.startsWith("/admin");
+                         pathname?.startsWith("/admin") ||
+                         pathname?.startsWith("/forgot-password");
 
   return (
     <LanguageProvider>

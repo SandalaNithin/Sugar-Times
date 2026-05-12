@@ -6,9 +6,15 @@ import { FacebookIcon, InstagramIcon, LinkedInIcon, MailIcon, TwitterXIcon, What
 const slugify = (s) =>
   (s || "").toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 
+const getImageUrl = (url) => {
+  if (!url) return null;
+  if (url.startsWith("http")) return url;
+  return `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}${url}`;
+};
+
 async function safeFetch(url) {
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -51,8 +57,9 @@ async function getAuthorData(slug) {
     slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
   const resolvedBio = matchingArticles[0]?.contributorBio?.trim() || "";
+  const resolvedImage = matchingArticles[0]?.contributorImage || "";
 
-  return { name: resolvedName, bio: resolvedBio, articles: matchingArticles };
+  return { name: resolvedName, bio: resolvedBio, image: resolvedImage, articles: matchingArticles };
 }
 
 export async function generateMetadata({ params }) {
@@ -64,9 +71,10 @@ export async function generateMetadata({ params }) {
 export default async function AuthorPage({ params }) {
   const { slug } = await params;
 
-  const { name, bio, articles } = await getAuthorData(slug);
+  const { name, bio, image, articles } = await getAuthorData(slug);
   const displayName = name || "Contributor";
   const displayBio = bio;
+  const displayImage = getImageUrl(image);
   const initial = (displayName.charAt(0) || "S").toUpperCase();
 
   return (
@@ -84,9 +92,17 @@ export default async function AuthorPage({ params }) {
 
         {/* Avatar + Name block */}
         <div className="flex flex-col items-center py-10 border-b border-slate-200">
-          <div className="w-[220px] h-[220px] rounded-full bg-slate-200 flex items-center justify-center text-slate-400 font-black text-7xl mb-6 border border-slate-200 shadow-sm">
-            {initial}
-          </div>
+          {displayImage ? (
+            <img 
+              src={displayImage} 
+              alt={displayName}
+              className="w-[220px] h-[220px] rounded-full object-cover mb-6 border border-slate-200 shadow-md ring-4 ring-slate-50"
+            />
+          ) : (
+            <div className="w-[220px] h-[220px] rounded-full bg-slate-200 flex items-center justify-center text-slate-400 font-black text-7xl mb-6 border border-slate-200 shadow-sm">
+              {initial}
+            </div>
+          )}
           <h2 className="text-2xl font-black text-slate-800">{displayName}</h2>
 
           {displayBio && (

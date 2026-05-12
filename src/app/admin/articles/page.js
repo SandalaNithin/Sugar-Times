@@ -57,11 +57,13 @@ function ArticlesContent() {
     excerpt: "",
     content: "",
     image: "",
+    author: "",
     premium: false,
     trending: false,
     showContributor: true,
     contributorName: "",
     contributorBio: "",
+    contributorImage: "",
     status: "published",
   });
   const [page, setPage] = useState(1);
@@ -133,11 +135,13 @@ function ArticlesContent() {
       excerpt: article.excerpt || "",
       content: article.content || "",
       image: article.image || article.imageUrl || "",
+      author: article.author || "",
       premium: !!article.premium,
       trending: !!article.trending,
       showContributor: article.showContributor !== false,
       contributorName: article.contributorName || "",
       contributorBio: article.contributorBio || "",
+      contributorImage: article.contributorImage || "",
       status: article.status || "published",
     });
     setShowForm(true);
@@ -175,11 +179,13 @@ function ArticlesContent() {
                 excerpt: item["Excerpt"] || item.excerpt || "",
                 content: item["Content"] || item.content || "<p></p>",
                 image: item["Image URL"] || item.image || "",
+                author: item["Author Name"] || item.author || "",
                 premium: item["Premium"] === "Yes" || item.premium === true,
                 trending: item["Trending"] === "Yes" || item.trending === true,
                 showContributor: item["Show Contributor"] !== "No",
                 contributorName: item["Contributor Name"] || "",
                 contributorBio: item["Contributor Bio"] || "",
+                contributorImage: item["Contributor Image URL"] || "",
                 status: item["Status"] || "published"
             });
             successCount++;
@@ -196,6 +202,7 @@ function ArticlesContent() {
 
   const exportMapping = (article) => ({
       "Headline": article.title,
+      "Author Name": article.author || "",
       "Category": article.category,
       "Sub-Category": article.subcategory || "",
       "Excerpt": article.excerpt || "",
@@ -206,7 +213,8 @@ function ArticlesContent() {
       "Status": article.status || "published",
       "Show Contributor": article.showContributor ? "Yes" : "No",
       "Contributor Name": article.contributorName || "",
-      "Contributor Bio": article.contributorBio || ""
+      "Contributor Bio": article.contributorBio || "",
+      "Contributor Image URL": article.contributorImage || ""
   });
 
   const handleCreate = async (e, type = "published") => {
@@ -245,7 +253,7 @@ function ArticlesContent() {
         });
       }
       setShowForm(false);
-      setForm({ id: "", title: "", category: DEFAULT_CATEGORY, subcategory: "", excerpt: "", content: "", image: "", premium: false, trending: false, showContributor: true, contributorName: "", contributorBio: "", status: "published" });
+      setForm({ id: "", title: "", category: DEFAULT_CATEGORY, subcategory: "", excerpt: "", content: "", image: "", premium: false, trending: false, showContributor: true, contributorName: "", contributorBio: "", contributorImage: "", status: "published" });
       fetchArticles();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to save article");
@@ -263,6 +271,8 @@ function ArticlesContent() {
   const handleMediaSelect = (url) => {
     if (mediaContext === "cover") {
       setForm({ ...form, image: url });
+    } else if (mediaContext === "author") {
+      setForm({ ...form, contributorImage: url });
     } else {
       // Insert into Quill editor
       const quill = editorRef.current?.getEditor();
@@ -344,6 +354,13 @@ function ArticlesContent() {
                   <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">Article Headline <span className="text-red-500">*</span></label>
                   <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
                     placeholder="e.g. Maharashtra sugar mills see record production..."
+                    className="w-full px-5 py-4 border-2 border-slate-50 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-green-400/10 focus:border-green-500 bg-slate-50/50 transition-all" />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Display Author (Header)</label>
+                  <input value={form.author} onChange={(e) => setForm({ ...form, author: e.target.value })}
+                    placeholder="Sugar Times Team"
                     className="w-full px-5 py-4 border-2 border-slate-50 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-green-400/10 focus:border-green-500 bg-slate-50/50 transition-all" />
                 </div>
 
@@ -457,6 +474,22 @@ function ArticlesContent() {
                         placeholder="Sugar Times Team"
                         className="w-full px-5 py-4 border-2 border-slate-50 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-emerald-400/10 focus:border-emerald-500 bg-white transition-all"
                       />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Contributor Photo (URL)</label>
+                      <div className="flex gap-4">
+                        <input 
+                          value={form.contributorImage} 
+                          onChange={(e) => setForm({ ...form, contributorImage: e.target.value })}
+                          placeholder="https://..."
+                          className="flex-1 px-5 py-4 border-2 border-slate-50 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-emerald-400/10 focus:border-emerald-500 bg-white transition-all"
+                        />
+                        <button type="button" onClick={() => { setMediaContext("author"); setShowMedia(true); }}
+                          className="px-6 py-4 bg-emerald-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 transition-all">
+                          Browse
+                        </button>
+                      </div>
                     </div>
 
                     <div>

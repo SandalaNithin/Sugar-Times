@@ -152,7 +152,7 @@ const PALETTES = [
 function HeroCard({ article: a }) {
   return (
     <Link href={`/article/${a._id}`} className="relative group overflow-hidden block h-full bg-[#052616] border border-white/5 rounded-lg shadow-lg">
-      <img src={img(a.image)} alt={a.title} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
+      <img src={img(a.image)} alt={a.title} className="absolute inset-0 w-full h-full object-contain opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-5">
         <h3 className="text-white text-[16px] font-black leading-snug group-hover:text-green-400 transition-colors line-clamp-3">{a.title}</h3>
         <div className="flex items-center gap-2 mt-2.5">
@@ -168,7 +168,7 @@ function HeroCard({ article: a }) {
 function HeroCardLarge({ article: a }) {
   return (
     <Link href={`/article/${a._id}`} className="relative group overflow-hidden block h-full bg-[#052616] border border-white/5 rounded-lg shadow-xl">
-      <img src={img(a.image)} alt={a.title} className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000" />
+      <img src={img(a.image)} alt={a.title} className="absolute inset-0 w-full h-full object-contain opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000" />
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent flex flex-col justify-end p-8 md:p-12">
         <span className="bg-green-600 text-white text-[11px] font-black uppercase px-3 py-1.5 w-max mb-5 tracking-widest rounded-md border border-green-400/30">{a.subcategory || a.category}</span>
         <h2 className="text-white text-xl sm:text-3xl md:text-5xl font-black leading-[1.05] group-hover:text-green-400 transition-colors mb-4">{a.title}</h2>
@@ -190,7 +190,7 @@ function HeroCardLarge({ article: a }) {
 function CategoryHeroCard({ article: a, palette: p }) {
   return (
     <Link href={`/article/${a._id}`} className="relative group overflow-hidden block h-full bg-slate-900 rounded-lg">
-      <img src={img(a.image)} alt={a.title} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" />
+      <img src={img(a.image)} alt={a.title} className="absolute inset-0 w-full h-full object-contain opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-4">
         <h3 className="text-white text-[14px] font-bold leading-snug group-hover:text-green-400 transition-colors line-clamp-2">{a.title}</h3>
         <div className="flex items-center gap-2 mt-2">
@@ -205,7 +205,7 @@ function CategoryHeroCard({ article: a, palette: p }) {
 function CategoryHeroLarge({ article: a, palette: p }) {
   return (
     <Link href={`/article/${a._id}`} className="relative group overflow-hidden block h-full bg-slate-900 rounded-lg">
-      <img src={img(a.image)} alt={a.title} className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
+      <img src={img(a.image)} alt={a.title} className="absolute inset-0 w-full h-full object-contain opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-6 md:p-8">
         <span className={`${p.bg} text-white text-[10px] font-bold uppercase px-2.5 py-1 w-max mb-3 tracking-wider rounded`}>{a.subcategory || a.category}</span>
         <h2 className="text-white text-lg sm:text-2xl md:text-3xl font-black leading-tight group-hover:text-green-400 transition-colors mb-2 line-clamp-3">{a.title}</h2>
@@ -384,7 +384,7 @@ export default async function HomePage() {
                           {listItems.map((a) => (
                             <Link key={a._id} href={`/article/${a._id}`} className="group flex gap-4 items-start pb-4 border-b border-slate-100 last:border-0">
                               <div className="w-[100px] h-[70px] shrink-0 bg-slate-100 overflow-hidden rounded-md">
-                                <img src={img(a.image)} alt={a.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                <img src={img(a.image)} alt={a.title} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <span className={`text-[10px] font-bold ${p.pill} px-2 py-0.5 rounded-full inline-block mb-1`}>{a.subcategory || a.category}</span>
@@ -422,7 +422,7 @@ export default async function HomePage() {
                             {child.articles.slice(0, 3).map((a) => (
                               <Link key={a._id} href={`/article/${a._id}`} className="group flex gap-3 items-center">
                                 <div className="w-14 h-14 shrink-0 bg-slate-100 overflow-hidden rounded-lg">
-                                  <img src={img(a.image)} alt={a.title} className="w-full h-auto object-cover group-hover:scale-110 transition-transform" />
+                                  <img src={img(a.image)} alt={a.title} className="w-full h-auto object-contain group-hover:scale-110 transition-transform" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <h4 className={`text-[12px] font-bold text-slate-700 leading-snug group-hover:${p.text} transition-colors line-clamp-2`}>{a.title}</h4>
@@ -582,7 +582,7 @@ export default async function HomePage() {
                   {latestArticles.map((a) => (
                     <Link key={a._id} href={`/article/${a._id}`} className="group flex gap-3 items-start border-b border-slate-50 pb-3 last:border-0 last:pb-0">
                       <div className="w-16 h-12 shrink-0 bg-slate-100 overflow-hidden rounded">
-                        <img src={img(a.image)} alt={a.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                        <img src={img(a.image)} alt={a.title} className="w-full h-full object-contain group-hover:scale-105 transition-transform" />
                       </div>
                       <div>
                         <h4 className="text-[12px] font-bold text-slate-800 leading-tight group-hover:text-green-600 transition-colors line-clamp-2">{a.title}</h4>

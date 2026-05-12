@@ -52,3 +52,51 @@ body {
 .animate-ticker:hover {
   animation-play-state: paused;
 }
+
+/* Article Content Styles */
+.article-content-body p {
+  margin-bottom: 0.5rem !important;
+  line-height: 1.8;
+}
+
+.article-content-body img {
+  height: auto;
+  max-width: 100%;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Float images that are at the start of a paragraph */
+.article-content-body p img:first-child {
+  float: left;
+  margin: 0.5rem 1.5rem 1rem 0;
+  max-width: 40%;
+}
+
+.article-content-body img.alignleft,
+.article-content-body .alignleft img {
+  float: left;
+  margin: 0.5rem 1.5rem 1.5rem 0;
+}
+
+.article-content-body img.alignright,
+.article-content-body .alignright img {
+  float: right;
+  margin: 0.5rem 0 1.5rem 1.5rem;
+}
+
+.article-content-body img.aligncenter,
+.article-content-body .aligncenter img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1.5rem;
+  float: none;
+}
+
+/* Clearfix */
+.article-content-body::after {
+  content: "";
+  display: table;
+  clear: both;
+}

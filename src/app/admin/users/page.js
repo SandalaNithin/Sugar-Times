@@ -50,7 +50,6 @@ export default function AdminUsers() {
       setStats(statsRes.data);
     } catch (err) {
       if (isMountedRef.current) {
-        console.error("Failed to fetch users:", err);
         setUsers([]);
       }
     } finally {
@@ -106,8 +105,6 @@ export default function AdminUsers() {
           dateOfPayment: sub.dateOfPayment || ""
         };
       }
-    } catch (err) {
-      console.error("Failed to fetch user subscription details", err);
     } finally {
       setFormData(initialData);
       setEditModal(user);
@@ -165,7 +162,7 @@ export default function AdminUsers() {
         });
         successCount++;
       } catch (error) {
-        console.error("Failed to import user row:", i, error);
+        // Skip or handle failure silently for cleaner UI
       }
       updateProgress(i + 1);
     }

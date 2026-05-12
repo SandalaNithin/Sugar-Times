@@ -110,16 +110,21 @@ export default function AdminLoginPage() {
               </div>
             </div>
 
-            {/* Remember Me */}
-            <label className="flex items-center gap-2 text-slate-600 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={form.remember}
-                onChange={(e) => setForm({ ...form, remember: e.target.checked })}
-                className="w-3.5 h-3.5 rounded border-slate-300 text-purple-600 focus:ring-purple-400"
-              />
-              <span className="text-xs">Remember Me</span>
-            </label>
+            {/* Remember Me & Forgot Password */}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 text-slate-600 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={form.remember}
+                  onChange={(e) => setForm({ ...form, remember: e.target.checked })}
+                  className="w-3.5 h-3.5 rounded border-slate-300 text-purple-600 focus:ring-purple-400"
+                />
+                <span className="text-xs">Remember Me</span>
+              </label>
+              <Link href="/forgot-password" size="sm" className="text-[11px] font-bold text-purple-600 hover:text-purple-700 transition-colors uppercase tracking-widest">
+                Forgot Password?
+              </Link>
+            </div>
 
             {/* Continue */}
             <button

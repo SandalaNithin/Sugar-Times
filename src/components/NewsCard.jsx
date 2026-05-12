@@ -23,7 +23,7 @@ export default function NewsCard({ article, compact = false }) {
         <img
           src={getImageUrl(article.image)}
           alt={article.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-2 left-2 flex gap-1.5">
           <span className="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">

@@ -332,9 +332,15 @@ export default async function ArticlePage({ params }) {
                       <Link href={authorHref} className="inline-block text-xl font-black text-slate-900 hover:text-emerald-600 transition-colors">
                         {contributorName}
                       </Link>
-                      <p className="text-sm italic text-slate-500 mt-1 mb-4">
-                        <a href="https://sugartimes.co.in" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-600 transition-colors">http://sugartimes.co.in</a>
-                      </p>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-1 mt-1 mb-4">
+                        <p className="text-sm italic text-slate-500">
+                          <a href="https://sugartimes.co.in" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-600 transition-colors">http://sugartimes.co.in</a>
+                        </p>
+                        <span className="hidden sm:block text-slate-300">•</span>
+                        <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                          Published: {dynamicDate}
+                        </p>
+                      </div>
                       <p className="text-[15px] text-slate-700 leading-relaxed mb-5 whitespace-pre-line">
                         {contributorBio}
                       </p>

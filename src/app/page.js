@@ -4,6 +4,8 @@ import { ArrowRight, TrendingUp, TrendingDown, Minus, ChevronRight, BarChart2 } 
 import { CATEGORY_TREE } from "@/lib/categories";
 import Advertisement from "@/components/Advertisement";
 
+export const revalidate = 60; // Revalidate the page every 60 seconds
+
 /* ═══════════════════════════════════════════════════════════════════════════
    DATA FETCHING — Server-side, always fresh
    ═══════════════════════════════════════════════════════════════════════════ */

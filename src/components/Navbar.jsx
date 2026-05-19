@@ -121,7 +121,9 @@ export default function Navbar() {
             setSubscriptionStatus({ hasSubscription: false });
           }
         } catch (err) {
-          console.error("Failed to fetch subscription status", err);
+          if (err?.response?.status !== 401) {
+            console.error("Failed to fetch subscription status:", err.message);
+          }
           setSubscriptionStatus({ hasSubscription: false });
         }
       }

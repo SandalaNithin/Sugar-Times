@@ -53,12 +53,71 @@ body {
   animation-play-state: paused;
 }
 
-/* Article Content Styles */
+/* ===== Article Content — Fully Responsive ===== */
+
+/* Container: never overflow its parent. min-width:0 lets it shrink inside
+   flex parents (default min-width:auto would prevent shrinking).
+   overflow-wrap: normal => never break mid-word at the container level. */
+.article-content-body {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: normal !important;
+  word-wrap: normal !important;
+  word-break: normal !important;
+  hyphens: manual !important;
+  -webkit-hyphens: manual !important;
+  -ms-hyphens: manual !important;
+  box-sizing: border-box;
+}
+
+/* CRITICAL: also force every descendant from CMS HTML to wrap only at word
+   boundaries — overflow-wrap inherits, but CMS content may use <div>/<span>/
+   <strong>/<em> instead of <p>, and Tailwind prose classes or inline styles
+   may flip it back to break-word. !important seals it shut. We also clamp
+   each descendant to 100% width so inline `width=900` attrs can't force the
+   article wider than the card. */
+.article-content-body *,
+.article-content-body *::before,
+.article-content-body *::after {
+  max-width: 100% !important;
+  box-sizing: border-box;
+  overflow-wrap: normal !important;
+  word-wrap: normal !important;
+  word-break: normal !important;
+  hyphens: manual !important;
+  -webkit-hyphens: manual !important;
+  -ms-hyphens: manual !important;
+}
+
+/* Paragraphs / lists / quotes — left aligned by default. Justify is
+   reserved for ≥1024px (see media query below). */
+.article-content-body p,
+.article-content-body li,
+.article-content-body blockquote {
+  text-align: left;
+  text-align-last: left;
+  max-width: 100%;
+}
+
 .article-content-body p {
   margin-bottom: 0.5rem !important;
   line-height: 1.8;
 }
 
+/* Headings — always left-aligned, never justified */
+.article-content-body h1,
+.article-content-body h2,
+.article-content-body h3,
+.article-content-body h4,
+.article-content-body h5,
+.article-content-body h6 {
+  text-align: left;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  max-width: 100%;
+}
+
+/* Images — never exceed container width */
 .article-content-body img {
   height: auto;
   max-width: 100%;
@@ -66,7 +125,46 @@ body {
   margin-bottom: 1.5rem;
 }
 
-/* Float images that are at the start of a paragraph */
+/* Tables — make horizontally scrollable rather than blow out layout */
+.article-content-body table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-collapse: collapse;
+}
+
+/* Embeds (YouTube etc) — constrain to container */
+.article-content-body iframe,
+.article-content-body video,
+.article-content-body embed,
+.article-content-body object {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Code blocks — allow horizontal scroll instead of overflow */
+.article-content-body pre {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  white-space: pre;
+}
+
+/* Code may legitimately contain long unbreakable identifiers — allow break */
+.article-content-body code {
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Long inline links (URLs) — allow break so they don't push the layout */
+.article-content-body a {
+  overflow-wrap: break-word !important;
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+/* Float images that are at the start of a paragraph (desktop only) */
 .article-content-body p img:first-child {
   float: left;
   margin: 0.5rem 1.5rem 1rem 0;
@@ -77,12 +175,14 @@ body {
 .article-content-body .alignleft img {
   float: left;
   margin: 0.5rem 1.5rem 1.5rem 0;
+  max-width: 40%;
 }
 
 .article-content-body img.alignright,
 .article-content-body .alignright img {
   float: right;
   margin: 0.5rem 0 1.5rem 1.5rem;
+  max-width: 40%;
 }
 
 .article-content-body img.aligncenter,
@@ -99,4 +199,32 @@ body {
   content: "";
   display: table;
   clear: both;
+}
+
+/* ===== Large desktop (≥1024px) — only here do lines have enough words
+   for justify to look natural. Below this, lines are too short and
+   justify produces ugly gaps (especially around hyphenated terms like
+   "2025-26" that get broken across lines). ===== */
+@media (min-width: 1024px) {
+  .article-content-body p,
+  .article-content-body li,
+  .article-content-body blockquote {
+    text-align: justify;
+    text-justify: inter-word;
+    text-align-last: left;
+  }
+}
+
+/* ===== Mobile / small tablet — no floats, full-width images ===== */
+@media (max-width: 768px) {
+  .article-content-body p img:first-child,
+  .article-content-body img.alignleft,
+  .article-content-body .alignleft img,
+  .article-content-body img.alignright,
+  .article-content-body .alignright img {
+    float: none;
+    display: block;
+    margin: 0 auto 1.25rem auto;
+    max-width: 100%;
+  }
 }

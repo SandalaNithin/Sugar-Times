@@ -198,7 +198,7 @@ export default function LoginPage() {
         .otp-box:focus { box-shadow: 0 0 0 3px rgba(16,185,129,0.3); border-color: #10b981; outline: none; }
       `}</style>
 
-      <div className="relative min-h-screen flex items-center justify-center px-4 py-12 overflow-hidden">
+      <div className="relative min-h-screen flex items-center justify-center px-2 sm:px-3 md:px-4 py-6 md:py-8 lg:py-12 overflow-hidden">
         <Toaster position="top-right" containerStyle={{ zIndex: 99999 }} />
         {/* Background */}
         <div className="absolute inset-0 z-0">
@@ -214,18 +214,18 @@ export default function LoginPage() {
         <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-emerald-500/20 rounded-full blur-3xl z-0" />
         <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-teal-500/20 rounded-full blur-3xl z-0" />
 
-        <div className="relative z-10 w-full max-w-md">
+        <div className="relative z-10 w-full max-w-sm sm:max-w-md">
           {/* Card */}
-          <div className={`bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/40 p-8 md:p-10 transition-all duration-300 ${shake ? "animate-shake" : ""}`}>
+          <div className={`bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/40 p-5 sm:p-6 md:p-8 lg:p-10 transition-all duration-300 ${shake ? "animate-shake" : ""}`}>
 
             {/* Logo */}
-            <div className="flex flex-col items-center mb-7">
+            <div className="flex flex-col items-center mb-5 sm:mb-6 md:mb-7">
               <Link href="/" className="transition-transform hover:scale-105">
                 <Image
                   src="/sugar times main logo.png"
                   alt="Sugar Times"
                   width={160} height={70}
-                  className="h-16 w-auto object-contain"
+                  className="h-12 sm:h-14 md:h-16 w-auto object-contain"
                   priority
                 />
               </Link>
@@ -233,9 +233,9 @@ export default function LoginPage() {
 
             {/* Error Banner */}
             {error && (
-              <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3 mb-5 fade-up flex gap-2">
+              <div className="bg-red-50 border border-red-100 text-red-600 text-xs sm:text-sm rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 mb-4 sm:mb-5 fade-up flex gap-2">
                 <Shield size={16} className="text-red-500 shrink-0 mt-0.5" />
-                <div>
+                <div className="text-justify">
                   <p>{error}</p>
                   {error.toLowerCase().includes("not registered") && (
                     <span className="block mt-1.5">
@@ -250,17 +250,17 @@ export default function LoginPage() {
 
             {/* ── STEP 1: Email ── */}
             {step === STEP_EMAIL && (
-              <form onSubmit={handleSendOtp} className="space-y-5 fade-up">
+              <form onSubmit={handleSendOtp} className="space-y-4 sm:space-y-5 fade-up">
                 <div className="text-center mb-1">
-                  <div className="w-13 h-13 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-3" style={{ width: "3.25rem", height: "3.25rem" }}>
-                    <Mail size={24} className="text-emerald-600" />
+                  <div className="w-12 sm:w-13 h-12 sm:h-13 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-2 sm:mb-3" style={{ width: "3rem" }}>
+                    <Mail size={20} className="text-emerald-600 sm:w-6 sm:h-6" />
                   </div>
-                  <p className="text-slate-800 font-bold text-base">Sign in with Email</p>
-                  <p className="text-slate-400 text-xs mt-1">Enter your registered email address</p>
+                  <p className="text-slate-800 font-bold text-sm sm:text-base">Sign in with Email</p>
+                  <p className="text-slate-400 text-[11px] sm:text-xs mt-1 text-justify">Enter your registered email address</p>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black uppercase tracking-wider text-slate-600 mb-2">
+                  <label className="block text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-600 mb-1.5 sm:mb-2">
                     Email Address <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -269,7 +269,7 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="your@email.com"
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 transition-all bg-white"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 transition-all bg-white"
                     autoComplete="email"
                   />
                 </div>
@@ -278,16 +278,16 @@ export default function LoginPage() {
                   id="send-otp-btn"
                   type="submit"
                   disabled={loading || !email.includes('@')}
-                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black uppercase tracking-wider py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50"
+                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black uppercase tracking-wider py-2.5 sm:py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 text-xs sm:text-sm shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50"
                 >
                   {loading ? (
-                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Sending Code…</>
+                    <><div className="w-3.5 sm:w-4 h-3.5 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> <span className="text-xs sm:text-sm">Sending Code…</span></>
                   ) : (
-                    <><span>Send Verification Code</span><ArrowRight size={16} /></>
+                    <><span className="text-xs sm:text-sm">Send Verification Code</span><ArrowRight size={15} /></>
                   )}
                 </button>
 
-                <p className="text-center text-xs text-slate-400 pt-1">
+                <p className="text-center text-[10px] sm:text-xs text-slate-400 pt-1 text-justify">
                   No account?{" "}
                   <Link href="/subscription" className="text-emerald-600 font-bold hover:underline">
                     Subscribe now
@@ -295,9 +295,6 @@ export default function LoginPage() {
                 </p>
               </form>
             )}
-
-            {/* ── STEP 2: OTP ── */}
-            {step === STEP_OTP && (
               <div className="space-y-5 fade-up">
                 <div className="text-center mb-1">
                   <div className="w-13 h-13 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-3" style={{ width: "3.25rem", height: "3.25rem" }}>

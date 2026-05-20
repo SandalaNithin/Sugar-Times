@@ -7,6 +7,7 @@ import ArticleShareBar from "@/components/article/ArticleShareBar";
 import ArticleSidebar from "@/components/article/ArticleSidebar";
 import ArticleInlineAd from "@/components/article/ArticleInlineAd";
 import ArticleCommentForm from "@/components/article/ArticleCommentForm";
+import ArticleContent from "@/components/article/ArticleContent";
 
 export async function generateStaticParams() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -157,30 +158,30 @@ export default async function ArticlePage({ params }) {
   const sidebarAds = ads.filter((a) => a.placement === "sidebar" || a.placement === "both");
 
   return (
-    <div className="bg-[#fbfcfa] min-h-screen">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
+    <div className="bg-[#fbfcfa] min-h-screen overflow-x-hidden">
+      <div className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
 
-        {/* Breadcrumbs */}
-        <nav className="flex items-center gap-2 text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-8 border-b border-slate-100 pb-4">
+        {/* Breadcrumbs — wrap on narrow screens, truncate the title chip */}
+        <nav className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-8 border-b border-slate-100 pb-4">
           <Link href="/" className="hover:text-green-600 transition-colors">Home</Link>
-          <ChevronRight size={10} />
+          <ChevronRight size={10} className="shrink-0" />
           <Link href="/news" className="hover:text-green-600 transition-colors">All News</Link>
           {article.category && (
             <>
-              <ChevronRight size={10} />
+              <ChevronRight size={10} className="shrink-0" />
               <Link href={`/news?category=${encodeURIComponent(article.category)}`} className="hover:text-green-600 transition-colors">
                 {article.category}
               </Link>
             </>
           )}
-          <ChevronRight size={10} />
-          <span className="text-slate-900 truncate max-w-[200px] md:max-w-none">{article.title}</span>
+          <ChevronRight size={10} className="shrink-0" />
+          <span className="text-slate-900 truncate max-w-[160px] sm:max-w-[260px] md:max-w-none">{article.title}</span>
         </nav>
 
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
 
           {/* Main Content */}
-          <main className="w-full lg:flex-1 lg:min-w-0 lg:max-w-[820px] order-1 bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-100">
+          <main className="w-full min-w-0 lg:flex-1 lg:max-w-[820px] order-1 bg-white rounded-3xl p-4 sm:p-6 md:p-10 shadow-sm border border-slate-100 overflow-hidden">
             <header className="mb-8">
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 {article.category && (
@@ -206,7 +207,7 @@ export default async function ArticlePage({ params }) {
                 )}
               </div>
 
-              <h1 className="text-[28px] sm:text-[32px] md:text-[40px] lg:text-[44px] font-black text-slate-900 leading-[1.1] mb-4 tracking-tight break-words">
+              <h1 className="text-[22px] sm:text-[28px] md:text-[36px] lg:text-[44px] font-black text-slate-900 leading-[1.15] mb-4 tracking-tight break-words">
                 {article.title}
               </h1>
 
@@ -233,26 +234,30 @@ export default async function ArticlePage({ params }) {
             </header>
 
             {/* Cover */}
-            <figure className="mb-8 group relative">
-              <div className="overflow-hidden rounded-2xl bg-black/5 shadow-2xl flex items-center justify-center">
+            <figure className="mb-6 sm:mb-8 group relative w-full">
+              <div className="overflow-hidden rounded-xl sm:rounded-2xl bg-black/5 shadow-xl sm:shadow-2xl flex items-center justify-center w-full">
                 <img
                   src={getImageUrl(article.image)}
                   alt={article.title}
-                  className="w-full h-auto aspect-[16/9] object-contain group-hover:scale-105 transition-transform duration-1000 ease-out"
+                  className="w-full max-w-full h-auto aspect-[16/9] object-contain group-hover:scale-105 transition-transform duration-1000 ease-out"
                 />
               </div>
             </figure>
 
             {/* Content */}
-            <div className="prose prose-slate prose-base sm:prose-lg max-w-none break-words 
-              prose-headings:font-black prose-headings:text-slate-900 prose-headings:tracking-tight               prose-p:text-slate-700 prose-p:leading-[1.8] prose-p:font-medium prose-p:mb-4
-              prose-a:text-emerald-600 prose-a:font-bold prose-a:no-underline hover:prose-a:underline 
-              prose-img:rounded-2xl prose-img:shadow-lg prose-img:w-full prose-img:h-auto
-              prose-blockquote:border-l-4 prose-blockquote:border-emerald-500 prose-blockquote:bg-emerald-50/30 prose-blockquote:px-6 prose-blockquote:py-2 prose-blockquote:rounded-r-xl prose-blockquote:italic
+            <div className="prose prose-slate prose-sm sm:prose-base md:prose-lg max-w-none w-full min-w-0
+              prose-headings:font-black prose-headings:text-slate-900 prose-headings:tracking-tight prose-headings:text-left prose-headings:break-words
+              prose-p:text-slate-700 prose-p:leading-[1.8] prose-p:font-medium prose-p:mb-4
+              prose-a:text-emerald-600 prose-a:font-bold prose-a:no-underline hover:prose-a:underline prose-a:break-words
+              prose-img:rounded-2xl prose-img:shadow-lg prose-img:w-full prose-img:h-auto prose-img:max-w-full
+              prose-blockquote:border-l-4 prose-blockquote:border-emerald-500 prose-blockquote:bg-emerald-50/30 prose-blockquote:px-4 sm:prose-blockquote:px-6 prose-blockquote:py-2 prose-blockquote:rounded-r-xl prose-blockquote:italic
               prose-li:text-slate-700 prose-li:font-medium">
               {article.premium ? (
                 <div className="relative">
-                  <div className="opacity-40 select-none pointer-events-none article-content-body" dangerouslySetInnerHTML={{ __html: (article.content || "").slice(0, 400) }} />
+                  <ArticleContent
+                    html={(article.content || "").slice(0, 400)}
+                    className="opacity-40 select-none pointer-events-none"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent flex items-center justify-center pt-20">
                     <div className="bg-white border-2 border-emerald-500 rounded-3xl p-8 max-w-md text-center shadow-2xl translate-y-10">
                       <Lock size={32} className="text-emerald-500 mx-auto mb-4" />
@@ -263,7 +268,7 @@ export default async function ArticlePage({ params }) {
                   </div>
                 </div>
               ) : (
-                <div dangerouslySetInnerHTML={{ __html: article.content || "" }} className="article-content-body" />
+                <ArticleContent html={article.content || ""} />
               )}
             </div>
 
@@ -313,27 +318,27 @@ export default async function ArticlePage({ params }) {
               const authorHref = `/author/${authorSlug}?name=${encodeURIComponent(contributorName)}&bio=${encodeURIComponent(contributorBio)}`;
               const initial = contributorName.charAt(0).toUpperCase();
               return (
-                <div className="mt-12 p-8 rounded-lg border border-slate-200 bg-white">
-                  <div className="flex items-start gap-6">
-                    <Link href={authorHref} className="shrink-0">
+                <div className="mt-12 p-5 sm:p-8 rounded-lg border border-slate-200 bg-white">
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
+                    <Link href={authorHref} className="shrink-0 mx-auto sm:mx-0">
                       {article.contributorImage ? (
-                        <img 
-                          src={getImageUrl(article.contributorImage)} 
+                        <img
+                          src={getImageUrl(article.contributorImage)}
                           alt={contributorName}
-                          className="w-[120px] h-[120px] rounded-full object-cover border border-slate-200 hover:ring-4 hover:ring-emerald-100 transition-all shadow-sm"
+                          className="w-20 h-20 sm:w-[120px] sm:h-[120px] rounded-full object-cover border border-slate-200 hover:ring-4 hover:ring-emerald-100 transition-all shadow-sm"
                         />
                       ) : (
-                        <div className="w-[120px] h-[120px] rounded-full bg-slate-200 flex items-center justify-center text-slate-400 font-black text-4xl overflow-hidden border border-slate-200 hover:ring-4 hover:ring-emerald-100 transition-all">
+                        <div className="w-20 h-20 sm:w-[120px] sm:h-[120px] rounded-full bg-slate-200 flex items-center justify-center text-slate-400 font-black text-3xl sm:text-4xl overflow-hidden border border-slate-200 hover:ring-4 hover:ring-emerald-100 transition-all">
                           {initial}
                         </div>
                       )}
                     </Link>
-                    <div className="flex-1 min-w-0">
-                      <Link href={authorHref} className="inline-block text-xl font-black text-slate-900 hover:text-emerald-600 transition-colors">
+                    <div className="flex-1 min-w-0 text-center sm:text-left">
+                      <Link href={authorHref} className="inline-block text-lg sm:text-xl font-black text-slate-900 hover:text-emerald-600 transition-colors break-words">
                         {contributorName}
                       </Link>
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-1 mt-1 mb-4">
-                        <p className="text-sm italic text-slate-500">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-start justify-center gap-x-4 gap-y-1 mt-1 mb-4">
+                        <p className="text-sm italic text-slate-500 break-all">
                           <a href="https://sugartimes.co.in" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-600 transition-colors">http://sugartimes.co.in</a>
                         </p>
                         <span className="hidden sm:block text-slate-300">•</span>
@@ -341,10 +346,10 @@ export default async function ArticlePage({ params }) {
                           Published: {dynamicDate}
                         </p>
                       </div>
-                      <p className="text-[15px] text-slate-700 leading-relaxed mb-5 whitespace-pre-line">
+                      <p className="text-[15px] text-slate-700 leading-relaxed mb-5 whitespace-pre-line text-left sm:text-justify hyphens-auto">
                         {contributorBio}
                       </p>
-                      <div className="flex items-center gap-4 text-slate-700">
+                      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-slate-700">
                         <a href="https://www.facebook.com/TheSugarTimes/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-emerald-600 transition-colors"><FacebookIcon size={18} /></a>
                         <a href="https://www.instagram.com/sugartimesmagazine/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-emerald-600 transition-colors"><InstagramIcon size={18} /></a>
                         <a href="https://in.linkedin.com/company/sugar-times-magazine" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="hover:text-emerald-600 transition-colors"><LinkedInIcon size={18} /></a>

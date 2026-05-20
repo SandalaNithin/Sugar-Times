@@ -18,7 +18,7 @@ async function fetchJSON(url) {
   } catch {
     return null;
   }
-}
+9}
 
 function mapArticle(a) {
   return {

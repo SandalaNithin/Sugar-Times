@@ -38,18 +38,16 @@ export default function ContactPage() {
   return (
     <div className="bg-slate-50 min-h-screen font-sans">
       {/* Top Section: Header & Intro */}
-      <section className="bg-white py-12 md:py-20 px-4">
+      <section className="bg-white py-8 sm:py-12 md:py-20 px-3 sm:px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="max-w-2xl mb-12">
-            <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 uppercase tracking-tight">Contact Us</h1>
-            <p className="text-slate-600 text-base md:text-lg leading-relaxed">
-              We&apos;re always happy to hear from our readers, advertisers, subscribers, and industry 
-professionals. Whether you have a news tip, a press release, an advertising inquiry, or just 
-want to say hello — reach out to us through any of the channels below. 
+          <div className="max-w-2xl mb-8 sm:mb-12">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 mb-2 sm:mb-4 uppercase tracking-tight">Contact Us</h1>
+            <p className="text-slate-600 text-xs sm:text-base md:text-lg leading-relaxed text-justify">
+              We&apos;re always happy to hear from our readers, advertisers, subscribers, and industry professionals. Whether you have a news tip, a press release, an advertising inquiry, or just want to say hello — reach out to us through any of the channels below. 
             </p>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
+          <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 lg:gap-12 items-start">
             {/* Map Container */}
             <div className="w-full lg:w-3/5 aspect-video lg:aspect-auto lg:h-[450px] rounded-3xl overflow-hidden shadow-2xl shadow-slate-200 border border-slate-100">
               <iframe
@@ -63,7 +61,7 @@ want to say hello — reach out to us through any of the channels below.
             </div>
 
             {/* Info Cards */}
-            <div className="w-full lg:w-2/5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
+            <div className="w-full lg:w-2/5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4 lg:gap-6">
               {[
                 { 
                   icon: <div className="p-3 bg-blue-50 rounded-2xl"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></div>,
@@ -96,11 +94,11 @@ want to say hello — reach out to us through any of the channels below.
                   content: <div className="flex flex-col gap-0.5"><a href="https://sugartimes.co.in/" className="text-cyan-600 hover:underline">www.sugartimes.co.in</a></div>
                 }
               ].map((item, idx) => (
-                <div key={idx} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex items-start gap-4">
-                  <div className="shrink-0">{item.icon}</div>
-                  <div>
-                    <h3 className="font-black text-slate-800 text-[13px] uppercase tracking-widest mb-1.5">{item.title}</h3>
-                    <div className="text-slate-500 text-sm font-medium leading-relaxed">{item.content}</div>
+                <div key={idx} className="bg-white p-3 sm:p-4 lg:p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex items-start gap-2 sm:gap-3 lg:gap-4">
+                  <div className="shrink-0 text-xs sm:text-sm lg:text-base">{item.icon}</div>
+                  <div className="min-w-0">
+                    <h3 className="font-black text-slate-800 text-[11px] sm:text-[12px] lg:text-[13px] uppercase tracking-widest mb-1 sm:mb-1.5">{item.title}</h3>
+                    <div className="text-slate-500 text-xs sm:text-sm lg:text-sm font-medium leading-relaxed text-justify break-words">{item.content}</div>
                   </div>
                 </div>
               ))}
@@ -110,74 +108,74 @@ want to say hello — reach out to us through any of the channels below.
       </section>
 
       {/* Department Contact Cards */}
-      <section className="bg-slate-50 py-14 px-4">
+      <section className="bg-slate-50 py-10 sm:py-14 px-3 sm:px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-10">
-            <p className="text-green-600 font-black uppercase tracking-[0.35em] text-[11px] mb-3">Get In Touch</p>
-            <h2 className="text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-tight">Reach The Right Team</h2>
+          <div className="text-center mb-8 sm:mb-10">
+            <p className="text-green-600 font-black uppercase tracking-[0.35em] text-[10px] sm:text-[11px] mb-2 sm:mb-3">Get In Touch</p>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-tight px-2">Reach The Right Team</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
 
             {/* Editorial */}
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-8 flex flex-col gap-5">
-              <div className="w-12 h-12 bg-violet-100 rounded-2xl flex items-center justify-center text-2xl">✏️</div>
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-5 sm:p-6 lg:p-8 flex flex-col gap-4 sm:gap-5">
+              <div className="w-10 sm:w-12 h-10 sm:h-12 bg-violet-100 rounded-2xl flex items-center justify-center text-xl sm:text-2xl">✏️</div>
               <div>
-                <h3 className="text-base font-black text-slate-900 uppercase tracking-widest mb-1">Editorial</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">
+                <h3 className="text-xs sm:text-sm lg:text-base font-black text-slate-900 uppercase tracking-widest mb-1">Editorial</h3>
+                <p className="text-slate-500 text-xs sm:text-sm lg:text-sm leading-relaxed text-justify">
                   For news tips, press releases, interviews, expert articles, and editorial queries.
                 </p>
               </div>
-              <div className="mt-auto flex flex-col gap-2 pt-4 border-t border-slate-100">
-                <a href="mailto:info@sugartimes.co.in" className="flex items-center gap-2 text-sm font-semibold text-violet-600 hover:text-violet-800 transition-colors">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                  info@sugartimes.co.in
+              <div className="mt-auto flex flex-col gap-2 pt-3 sm:pt-4 border-t border-slate-100">
+                <a href="mailto:info@sugartimes.co.in" className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-violet-600 hover:text-violet-800 transition-colors">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  <span className="truncate">info@sugartimes.co.in</span>
                 </a>
-                <a href="tel:+917355453462" className="flex items-center gap-2 text-sm font-semibold text-violet-600 hover:text-violet-800 transition-colors">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.53a2 2 0 0 1 1.11-2.24l3-.29a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L6.91 8.72a16 16 0 0 0 6.29 6.29l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <a href="tel:+917355453462" className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-violet-600 hover:text-violet-800 transition-colors">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.53a2 2 0 0 1 1.11-2.24l3-.29a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L6.91 8.72a16 16 0 0 0 6.29 6.29l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                   +91 7355453462
                 </a>
               </div>
             </div>
 
             {/* Advertising */}
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-8 flex flex-col gap-5">
-              <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-2xl">📢</div>
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-5 sm:p-6 lg:p-8 flex flex-col gap-4 sm:gap-5">
+              <div className="w-10 sm:w-12 h-10 sm:h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-xl sm:text-2xl">📢</div>
               <div>
-                <h3 className="text-base font-black text-slate-900 uppercase tracking-widest mb-1">Advertising</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">
+                <h3 className="text-xs sm:text-sm lg:text-base font-black text-slate-900 uppercase tracking-widest mb-1">Advertising</h3>
+                <p className="text-slate-500 text-xs sm:text-sm lg:text-sm leading-relaxed text-justify">
                   For advertisement bookings, media kit requests, and promotional proposals.
                 </p>
               </div>
-              <div className="mt-auto flex flex-col gap-2 pt-4 border-t border-slate-100">
-                <a href="mailto:info@sugartimes.co.in" className="flex items-center gap-2 text-sm font-semibold text-green-600 hover:text-green-800 transition-colors">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                  info@sugartimes.co.in
+              <div className="mt-auto flex flex-col gap-2 pt-3 sm:pt-4 border-t border-slate-100">
+                <a href="mailto:info@sugartimes.co.in" className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-green-600 hover:text-green-800 transition-colors">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  <span className="truncate">info@sugartimes.co.in</span>
                 </a>
-                <a href="tel:+917355453462" className="flex items-center gap-2 text-sm font-semibold text-green-600 hover:text-green-800 transition-colors">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.53a2 2 0 0 1 1.11-2.24l3-.29a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L6.91 8.72a16 16 0 0 0 6.29 6.29l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <a href="tel:+917355453462" className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-green-600 hover:text-green-800 transition-colors">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.53a2 2 0 0 1 1.11-2.24l3-.29a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L6.91 8.72a16 16 0 0 0 6.29 6.29l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                   +91 7355453462
                 </a>
-                <p className="text-[11px] text-slate-400 font-medium mt-1">Ask for: Ms. Shashi Yogeshwar, Business Manager</p>
+                <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium mt-1">Ask for: Ms. Shashi Yogeshwar, Business Manager</p>
               </div>
             </div>
 
             {/* Subscriptions */}
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-8 flex flex-col gap-5">
-              <div className="w-12 h-12 bg-cyan-100 rounded-2xl flex items-center justify-center text-2xl">📬</div>
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-5 sm:p-6 lg:p-8 flex flex-col gap-4 sm:gap-5">
+              <div className="w-10 sm:w-12 h-10 sm:h-12 bg-cyan-100 rounded-2xl flex items-center justify-center text-xl sm:text-2xl">📬</div>
               <div>
-                <h3 className="text-base font-black text-slate-900 uppercase tracking-widest mb-1">Subscriptions</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">
+                <h3 className="text-xs sm:text-sm lg:text-base font-black text-slate-900 uppercase tracking-widest mb-1">Subscriptions</h3>
+                <p className="text-slate-500 text-xs sm:text-sm lg:text-sm leading-relaxed text-justify">
                   For print and digital subscription enquiries, renewal, and delivery issues.
                 </p>
               </div>
-              <div className="mt-auto flex flex-col gap-2 pt-4 border-t border-slate-100">
-                <a href="mailto:info@sugartimes.co.in" className="flex items-center gap-2 text-sm font-semibold text-cyan-600 hover:text-cyan-800 transition-colors">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                  info@sugartimes.co.in
+              <div className="mt-auto flex flex-col gap-2 pt-3 sm:pt-4 border-t border-slate-100">
+                <a href="mailto:info@sugartimes.co.in" className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-cyan-600 hover:text-cyan-800 transition-colors">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  <span className="truncate">info@sugartimes.co.in</span>
                 </a>
-                <a href="/subscription" className="flex items-center gap-2 text-sm font-semibold text-cyan-600 hover:text-cyan-800 transition-colors">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                  sugartimes.co.in/subscribe
+                <a href="/subscription" className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-cyan-600 hover:text-cyan-800 transition-colors">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  sugartimes.co.in
                 </a>
               </div>
             </div>
@@ -187,11 +185,11 @@ want to say hello — reach out to us through any of the channels below.
       </section>
 
       {/* WhatsApp Section */}
-      <section className="bg-[#075E54] py-14 px-4">
+      <section className="bg-[#075E54] py-10 sm:py-14 px-3 sm:px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-green-300 font-black uppercase tracking-[0.35em] text-[11px] mb-4">Instant Response</p>
-          <h2 className="text-3xl md:text-4xl font-black text-white mb-3">Connect With Us Instantly on WhatsApp</h2>
-          <p className="text-green-200/80 text-sm mb-8 max-w-lg mx-auto">
+          <p className="text-green-300 font-black uppercase tracking-[0.35em] text-[10px] sm:text-[11px] mb-2 sm:mb-4">Instant Response</p>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2 sm:mb-3 px-2">Connect With Us Instantly on WhatsApp</h2>
+          <p className="text-green-200/80 text-xs sm:text-sm px-3 text-justify mb-6 sm:mb-8 max-w-lg mx-auto">
             We respond to messages on WhatsApp during working hours<br className="hidden sm:block" />
             <span className="font-semibold text-white">Mon–Sat, 10am–6pm.</span>
           </p>

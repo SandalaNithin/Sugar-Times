@@ -295,6 +295,9 @@ export default function LoginPage() {
                 </p>
               </form>
             )}
+
+            {/* ── STEP 2: OTP ── */}
+            {step === STEP_OTP && (
               <div className="space-y-5 fade-up">
                 <div className="text-center mb-1">
                   <div className="w-13 h-13 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-3" style={{ width: "3.25rem", height: "3.25rem" }}>

@@ -37,6 +37,18 @@ body {
   color: #1e293b;
 }
 
+button, 
+[role="button"],
+input[type="submit"],
+input[type="button"] {
+  cursor: pointer;
+}
+
+button:disabled,
+input:disabled {
+  cursor: default;
+}
+
 /* Scrolling News Ticker Animation */
 @keyframes ticker {
   0% { transform: translateX(0); }

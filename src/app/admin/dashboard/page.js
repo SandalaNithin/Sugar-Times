@@ -53,6 +53,7 @@ export default function AdminDashboard() {
   }, [user, isAdmin, authLoading, router]);
 
   const fetchData = useCallback(async () => {
+    setLoading(true);
     try {
       const [statsRes, usersRes, articlesRes, revenueRes, paymentsRes] =
         await Promise.allSettled([
@@ -131,7 +132,7 @@ export default function AdminDashboard() {
         </div>
         <button
           onClick={fetchData}
-          className="flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm"
+          className="cursor-pointer flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm disabled:opacity-70 disabled:cursor-wait"
         >
           <RefreshCw size={16} className={loading ? "animate-spin" : ""} /> Refresh
         </button>

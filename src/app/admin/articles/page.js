@@ -318,7 +318,7 @@ function ArticlesContent() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-8 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
         <div>
           <h1 className="text-2xl font-black text-slate-900 flex items-center gap-3">
             {urlTrending ? <TrendingUp className="text-red-500" /> : <FileText className="text-green-500" />}
@@ -329,7 +329,7 @@ function ArticlesContent() {
           </p>
         </div>
         <button onClick={() => setShowForm(true)}
-          className="flex items-center gap-3 bg-[#1b5e20] hover:bg-black text-white font-black px-6 py-3.5 rounded-xl text-[11px] uppercase tracking-widest transition-all shadow-lg hover:shadow-green-900/20 active:scale-95 group">
+          className="w-full sm:w-auto justify-center flex items-center gap-3 bg-[#1b5e20] hover:bg-black text-white font-black px-6 py-3.5 rounded-xl text-[11px] uppercase tracking-widest transition-all shadow-lg hover:shadow-green-900/20 active:scale-95 group">
           <Plus size={16} className="group-hover:rotate-90 transition-transform duration-300" /> 
           {urlCategory ? `Add ${urlCategory} Article` : "Draft New Article"}
         </button>
@@ -338,13 +338,13 @@ function ArticlesContent() {
       {/* Create form modal */}
       {showForm && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[32px] w-full max-w-2xl p-10 max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100 animate-in fade-in zoom-in duration-300">
-            <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-50">
+          <div className="bg-white rounded-[32px] w-full max-w-2xl p-6 sm:p-10 max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100 animate-in fade-in zoom-in duration-300">
+            <div className="flex items-start justify-between gap-4 mb-8 pb-6 border-b border-slate-50">
               <div>
-                <h2 className="font-black text-slate-900 text-2xl tracking-tight uppercase italic">{urlCategory ? `Publish to ${urlCategory}` : "New Editorial Draft"}</h2>
-                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Fill in the details to go live on the user panel</p>
+                <h2 className="font-black text-slate-900 text-xl sm:text-2xl tracking-tight uppercase italic">{urlCategory ? `Publish to ${urlCategory}` : "New Editorial Draft"}</h2>
+                <p className="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest mt-1">Fill in the details to go live on the user panel</p>
               </div>
-              <button onClick={() => setShowForm(false)} className="w-10 h-10 flex items-center justify-center hover:bg-slate-50 rounded-full text-slate-400 hover:text-slate-900 transition-all border border-transparent hover:border-slate-100"><X size={20} /></button>
+              <button onClick={() => setShowForm(false)} className="shrink-0 w-10 h-10 flex items-center justify-center hover:bg-slate-50 rounded-full text-slate-400 hover:text-slate-900 transition-all border border-transparent hover:border-slate-100"><X size={20} /></button>
             </div>
             <Toaster position="top-right" />
             
@@ -395,7 +395,7 @@ function ArticlesContent() {
                   </select>
                 </div>
 
-                <div className="flex items-center gap-6 pt-2">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 pt-2">
                   <label className="flex items-center gap-3 cursor-pointer group">
                     <div className={`w-10 h-6 rounded-full relative transition-colors duration-300 ${form.premium ? "bg-slate-900" : "bg-slate-200"}`}>
                        <input type="checkbox" className="hidden" checked={form.premium} onChange={(e) => setForm({ ...form, premium: e.target.checked })} />
@@ -417,12 +417,12 @@ function ArticlesContent() {
 
               <div>
                 <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Cover Media (Image URL)</label>
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })}
                     placeholder="https://images.unsplash.com/..."
                     className="flex-1 px-5 py-4 border-2 border-slate-50 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-green-400/10 focus:border-green-500 bg-slate-50/50 transition-all" />
                   <button type="button" onClick={() => { setMediaContext("cover"); setShowMedia(true); }}
-                    className="px-6 py-4 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all flex items-center gap-2">
+                    className="w-full sm:w-auto px-6 py-4 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all flex items-center justify-center gap-2">
                     <LayoutGrid size={16} /> Explorer
                   </button>
                 </div>
@@ -450,7 +450,7 @@ function ArticlesContent() {
                   of the article page. Toggle controls visibility; the two
                   fields below drive the card content on publish. */}
               <div className="rounded-2xl border-2 border-slate-50 bg-slate-50/40 p-6 space-y-5">
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
                     <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Authorized Contributor</h3>
                     <p className="text-[11px] text-slate-500 font-medium mt-1">Shown as a card at the bottom of the article page.</p>
@@ -478,7 +478,7 @@ function ArticlesContent() {
                     
                     <div>
                       <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Contributor Photo (URL)</label>
-                      <div className="flex gap-4">
+                      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                         <input 
                           value={form.contributorImage} 
                           onChange={(e) => setForm({ ...form, contributorImage: e.target.value })}
@@ -486,7 +486,7 @@ function ArticlesContent() {
                           className="flex-1 px-5 py-4 border-2 border-slate-50 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-emerald-400/10 focus:border-emerald-500 bg-white transition-all"
                         />
                         <button type="button" onClick={() => { setMediaContext("author"); setShowMedia(true); }}
-                          className="px-6 py-4 bg-emerald-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 transition-all">
+                          className="w-full sm:w-auto px-6 py-4 bg-emerald-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 transition-all">
                           Browse
                         </button>
                       </div>
@@ -506,7 +506,7 @@ function ArticlesContent() {
                 )}
               </div>
 
-              <div className="flex gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
                 <button type="button" onClick={() => setShowForm(false)}
                   className="flex-1 py-4 border-2 border-slate-50 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-all">Discard</button>
                 <button type="button" disabled={saving} onClick={() => handleCreate(null, "draft")}

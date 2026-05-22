@@ -7,7 +7,7 @@ const API_BASE_URL =
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000,
+  timeout: 30000,
   // Let axios pick the default adapter (xhr in browser, http in node).
   // The explicit `fetch` adapter in earlier versions silently returned
   // responses as strings in some browsers, leaving `res.data` as raw

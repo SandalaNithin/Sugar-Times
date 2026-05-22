@@ -50,7 +50,7 @@ const SectionHeader = ({ title }) => (
   </h3>
 );
 
-function CategoryTreeNav({ currentHref }) {
+function CategoryTreeNav({ currentHref, onSelect }) {
   const safeHref = currentHref || "";
   const [categoryTree, setCategoryTree] = useState(CATEGORY_TREE);
 
@@ -115,6 +115,7 @@ function CategoryTreeNav({ currentHref }) {
               <div className="ml-3 pl-3 border-l border-emerald-700/50 mt-1 mb-1 space-y-0.5">
                 <Link
                   href={parentHref}
+                  onClick={onSelect}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-[11px] font-semibold transition-colors ${isParentActive
                       ? "bg-emerald-600/40 text-white"
                       : "text-emerald-200/80 hover:bg-white/5 hover:text-white"
@@ -130,6 +131,7 @@ function CategoryTreeNav({ currentHref }) {
                     <Link
                       key={child.slug}
                       href={href}
+                      onClick={onSelect}
                       className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-[11px] transition-colors ${active
                           ? "bg-emerald-600/40 text-white font-bold"
                           : "text-emerald-200/70 hover:bg-white/5 hover:text-white"
@@ -149,7 +151,7 @@ function CategoryTreeNav({ currentHref }) {
   );
 }
 
-function SidebarNav({ handleLogout }) {
+function SidebarNav({ handleLogout, onSelect }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentHref = buildFullHref(pathname, searchParams);
@@ -160,6 +162,7 @@ function SidebarNav({ handleLogout }) {
       <Link
         href={href}
         prefetch={false}
+        onClick={onSelect}
         className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-medium transition-colors ${isActive
             ? "bg-white/10 text-white shadow-sm border border-white/10"
             : "text-emerald-100 hover:bg-white/5 hover:text-white"
@@ -205,7 +208,7 @@ function SidebarNav({ handleLogout }) {
           <Folder size={12} className="text-emerald-400/60" />
           <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400/60">Categories</span>
         </div>
-        <CategoryTreeNav currentHref={currentHref} />
+        <CategoryTreeNav currentHref={currentHref} onSelect={onSelect} />
       </div>
 
       <div className="pt-4 mt-6 border-t border-emerald-800/50">
@@ -226,16 +229,40 @@ export default function AdminLayout({ children }) {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+  useEffect(() => {
+    const saved = localStorage.getItem("adminSidebarOpen");
+    if (saved !== null) {
+      setSidebarOpen(saved === "true");
+    } else if (window.innerWidth < 1024) {
+      setSidebarOpen(false);
+    }
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("token");
     router.push("/login");
   };
 
-  const toggleSidebar = () => setSidebarOpen((v) => !v);
+  const toggleSidebar = () => {
+    setSidebarOpen((v) => {
+      const newVal = !v;
+      if (typeof window !== "undefined") {
+        localStorage.setItem("adminSidebarOpen", String(newVal));
+      }
+      return newVal;
+    });
+  };
+
+  const handleSidebarSelect = () => {
+    setSidebarOpen(false);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("adminSidebarOpen", "false");
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#f4f3ec] flex font-sans">
+    <div className="min-h-screen bg-[#f4f3ec] flex font-sans" suppressHydrationWarning>
       {/* Backdrop for mobile when sidebar is open */}
       {sidebarOpen && (
         <div
@@ -265,7 +292,7 @@ export default function AdminLayout({ children }) {
         </div>
 
         <Suspense fallback={<div className="p-8 text-emerald-200/50 text-xs text-center">Loading Nav...</div>}>
-          <SidebarNav handleLogout={handleLogout} />
+          <SidebarNav handleLogout={handleLogout} onSelect={handleSidebarSelect} />
         </Suspense>
       </aside>
 
